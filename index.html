@@ -60,7 +60,7 @@ nav .logo small{display:block;font-size:10px;letter-spacing:.4em;opacity:.8}
 nav ul{display:flex;gap:28px;list-style:none;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
 nav a{text-decoration:none;opacity:.85;padding-bottom:3px;border-bottom:1px solid transparent}
 nav a.act{opacity:1;border-bottom-color:currentColor}
-@media(max-width:720px){nav{padding:14px 18px}nav .logo{font-size:17px}nav .logo small{font-size:8px;letter-spacing:.3em}nav ul{gap:12px;font-size:10px;letter-spacing:.04em}nav ul li:first-child{display:none}}
+@media(max-width:720px){nav{padding:12px 16px;align-items:flex-start}nav .logo{font-size:16px}nav .logo small{font-size:7px;letter-spacing:.28em}nav ul{gap:10px;font-size:10px;letter-spacing:.03em;white-space:nowrap;flex-wrap:nowrap}nav ul li:first-child,nav ul li:last-child{display:none}}
 
 /* ===== ACT 1: hero + descenso (sticky canvas) ===== */
 #descent{position:relative;height:600vh}
@@ -635,6 +635,6 @@ shareBtn.addEventListener('click',async()=>{
   setTimeout(()=>shareBtn.textContent='Copiar link de mi fórmula',2200)});
 </script>
 <script type="module" src="scene.js?v=18"></script>
-<script type="module" src="builder3d.js?v=4"></script>
+<script type="module" src="builder3d.js?v=6"></script>
 </body>
 </html>
