@@ -151,6 +151,41 @@ function glowTex(){const c=document.createElement('canvas');c.width=c.height=256
   g.fillStyle=rg;g.fillRect(0,0,256,256);const t=new T.CanvasTexture(c);t.colorSpace=T.SRGBColorSpace;return t}
 const sunGlow=new T.Sprite(new T.SpriteMaterial({map:glowTex(),transparent:true,opacity:.9,depthWrite:false,blending:T.AdditiveBlending,fog:false}));
 sunGlow.position.set(28,36,-52);sunGlow.scale.set(46,46,1);sunGlow.material.opacity=.7;scene.add(sunGlow);
+// ---------- vida del campo: matas de pasto, flores, terrones ----------
+const fieldExtra=new T.Group();scene.add(fieldExtra);
+{ // matas de pasto (5 hojitas en abanico, con viento)
+ const tp=[];for(let i=0;i<5;i++){const g=new T.ConeGeometry(0.014,0.26,4);
+   g.rotateZ((i-2)*.28+(rnd()-.5)*.15);g.rotateY(rnd()*6.28);g.translate((rnd()-.5)*.05,.12,(rnd()-.5)*.05);
+   bakeColor(g,(c,x,y)=>{c.setHSL(.27,.45,lerp(.14,.3,y*3.5)) });tp.push({geo:g,mat:0})}
+ const tuftGeo=mergeGeoms(tp);
+ const NT=LOW?240:680;const tufts=new T.InstancedMesh(tuftGeo,windify(new T.MeshStandardMaterial({vertexColors:true,roughness:.9,side:T.DoubleSide})),NT);
+ {const m=new T.Matrix4(),q=new T.Quaternion(),e=new T.Euler(),ps=new T.Vector3(),sc=new T.Vector3();
+  let i=0,guard=0;
+  while(i<NT&&guard++<20000){const x=(rnd()-.5)*32,z=-17+rnd()*24;
+   if((Math.abs(x-0.35)<1.7&&z>0.6&&z<8.6))continue;
+   e.set(0,rnd()*6.28,0);q.setFromEuler(e);const sk=.7+rnd()*.7;
+   ps.set(x,terrainH(x,z),z);sc.set(sk,sk,sk);m.compose(ps,q,sc);tufts.setMatrixAt(i,m);i++}}
+ fieldExtra.add(tufts)}
+{ // flores silvestres
+ const NF=LOW?50:130;
+ const stems=new T.InstancedMesh(new T.ConeGeometry(0.007,0.18,3),new T.MeshStandardMaterial({color:0x4a6b33,roughness:.9}),NF);
+ const heads=new T.InstancedMesh(new T.SphereGeometry(0.022,6,5),new T.MeshStandardMaterial({roughness:.6}),NF);
+ {const m=new T.Matrix4(),q=new T.Quaternion(),ps=new T.Vector3(),sc=new T.Vector3(),col=new T.Color();
+  const pal=[0xfff6e0,0xf2d98c,0xf7f7f2,0xf0c96a];
+  for(let i=0;i<NF;i++){let x,z;do{x=(rnd()-.5)*30;z=-16+rnd()*23}while(Math.abs(x-0.35)<1.7&&z>0.6&&z<8.6);
+   const h=terrainH(x,z);ps.set(x,h+.09,z);sc.set(1,1,1);m.compose(ps,q.identity(),sc);stems.setMatrixAt(i,m);
+   ps.set(x,h+.19,z);m.compose(ps,q,sc);heads.setMatrixAt(i,m);
+   col.setHex(pal[(rnd()*pal.length)|0]);heads.setColorAt(i,col)}
+  heads.instanceColor.needsUpdate=true}
+ fieldExtra.add(stems,heads)}
+{ // terrones sueltos
+ const NCL=LOW?70:170;const clods=new T.InstancedMesh(new T.DodecahedronGeometry(1,0),new T.MeshStandardMaterial({color:0x54412c,roughness:1,flatShading:true}),NCL);
+ {const m=new T.Matrix4(),q=new T.Quaternion(),e=new T.Euler(),ps=new T.Vector3(),sc=new T.Vector3();
+  for(let i=0;i<NCL;i++){const x=(rnd()-.5)*32,z=-17+rnd()*24;
+   e.set(rnd()*6,rnd()*6,rnd()*6);q.setFromEuler(e);const sk=.02+rnd()*.05;
+   ps.set(x,terrainH(x,z)+sk*.6,z);sc.set(sk*1.4,sk,sk*1.1);m.compose(ps,q,sc);clods.setMatrixAt(i,m)}}
+ fieldExtra.add(clods)}
+
 // ---------- POLEN / aire ----------
 const NPOL=LOW?200:420;const polP=new Float32Array(NPOL*3),polD=[];
 for(let i=0;i<NPOL;i++){polP.set([(rnd()-.5)*26,.3+rnd()*4.5,-14+rnd()*18],i*3);polD.push(rnd()*6.28)}
@@ -273,10 +308,19 @@ function branch(p0,dir,depth){
 [[-3.4,-2.2],[-.2,-3.4],[3,-1.8],[6.2,-4.5],[-6.6,-4.2]].forEach(([x,z])=>branch(new T.Vector3(x,.06,z),new T.Vector3(0,-1,0),0));
 const roots=new T.Mesh(mergeGeoms(rootGeos.map(g=>({geo:g,mat:0}))),rootMat);scene.add(roots);
 
+// ---------- textura moteada (gránulo realista) ----------
+function mottleTex(){const c=document.createElement('canvas');c.width=c.height=256;const g=c.getContext('2d');
+  g.fillStyle='#e7dfca';g.fillRect(0,0,256,256);const r=seeded(21);
+  for(let i=0;i<420;i++){const t=r();g.fillStyle=t<.5?`rgba(158,146,118,${.06+r()*.1})`:`rgba(196,184,156,${.05+r()*.08})`;
+    g.beginPath();g.ellipse(r()*256,r()*256,1.5+r()*11,1.5+r()*7,r()*3.14,0,7);g.fill()}
+  for(let i=0;i<700;i++){g.fillStyle=`rgba(92,82,64,${.1+r()*.14})`;g.fillRect(r()*256,r()*256,1,1)}
+  const t=new T.CanvasTexture(c);t.colorSpace=T.SRGBColorSpace;t.wrapS=t.wrapT=T.RepeatWrapping;return t}
+const MOTTLE=mottleTex();
+
 // ---------- GRÁNULOS con nutrientes ----------
 const NG=56,NS=12;
 const grains=new T.InstancedMesh(new T.SphereGeometry(1,28,18),new T.MeshStandardMaterial({color:0xd9d0bd,roughness:.92}),NG);
-const specks=new T.InstancedMesh(new T.SphereGeometry(1,8,6),new T.MeshStandardMaterial({roughness:.55}),NG*NS);
+const specks=new T.InstancedMesh(new T.SphereGeometry(1,8,6),new T.MeshStandardMaterial({roughness:.8}),NG*NS);
 const gd=[];{const col=new T.Color();
  for(let i=0;i<NG;i++){gd.push({x:(rnd()-.5)*12,y:-4.2-rnd()*6.5,z:-8+rnd()*6,r:.15+rnd()*.3,ph:rnd()*6.28,sp:[]});
   for(let j=0;j<NS;j++){const u=rnd()*6.28,v=Math.acos(2*rnd()-1);
@@ -288,8 +332,8 @@ const M=new T.Matrix4(),Q=new T.Quaternion(),E=new T.Euler(),PS=new T.Vector3(),
 function updateGrains(t,a){for(let i=0;i<NG;i++){const g=gd[i];const r=g.r*a;
   const cx=g.x+Math.sin(t*.5+g.ph)*.25,cy=g.y+Math.cos(t*.4+g.ph)*.25,cz=g.z;
   E.set(t*.1+g.ph,t*.15,0);Q.setFromEuler(E);PS.set(cx,cy,cz);SC.set(r,r,r);M.compose(PS,Q,SC);grains.setMatrixAt(i,M);
-  for(let j=0;j<NS;j++){const s=gd[i].sp[j].clone().applyQuaternion(Q).multiplyScalar(r*.98);
-   PS.set(cx+s.x,cy+s.y,cz+s.z);const ss=r*.11;SC.set(ss,ss,ss);M.compose(PS,Q0,SC);specks.setMatrixAt(i*NS+j,M)}}
+  for(let j=0;j<NS;j++){const s=gd[i].sp[j].clone().applyQuaternion(Q).multiplyScalar(r*.965);
+   PS.set(cx+s.x,cy+s.y,cz+s.z);const ss=r*.075;SC.set(ss,ss,ss);M.compose(PS,Q0,SC);specks.setMatrixAt(i*NS+j,M)}}
   grains.instanceMatrix.needsUpdate=true;specks.instanceMatrix.needsUpdate=true}
 
 // ---------- FLUJO DE ABSORCIÓN (gránulo → raíz) ----------
@@ -310,7 +354,7 @@ const motG=new T.BufferGeometry();motG.setAttribute('position',new T.BufferAttri
 const motes=new T.Points(motG,new T.PointsMaterial({map:DOT,depthWrite:false,alphaTest:.05,color:0xc9a86a,size:.035,transparent:true,opacity:.5}));scene.add(motes);
 
 // ---------- GRÁNULO HÉROE + disolución ----------
-const hero=new T.Mesh(new T.SphereGeometry(1,64,40),new T.MeshStandardMaterial({color:0xe3dac6,roughness:.88}));
+const hero=new T.Mesh(new T.SphereGeometry(1,64,40),new T.MeshStandardMaterial({map:MOTTLE,roughness:.9}));
 hero.position.set(1.15,-13.6,-2.6);scene.add(hero);
 const NP=900;const pp=new Float32Array(NP*3),pc=new Float32Array(NP*3),pdir=[];
 {const col=new T.Color();for(let i=0;i<NP;i++){const u=rnd()*6.28,v=Math.acos(2*rnd()-1);
@@ -368,7 +412,7 @@ function frame(ts){const t=ts/1000;const dt=Math.min(.05,t-lastT||.016);lastT=t;
   if(Math.abs(pT-pS)<.0004)pS=pT;
   const p=pS;
   camAt(p,t);
-  wheat.visible=p<.34;if(wheat.visible)updateButterflies(t);butterflies.forEach(b=>b.visible=p<.28);clouds.forEach(c=>{c.visible=p<.3;c.position.x+=c.userData.v*.016;if(c.position.x>40)c.position.x=-40});
+  wheat.visible=p<.34;fieldExtra.visible=wheat.visible;if(wheat.visible)updateButterflies(t);butterflies.forEach(b=>b.visible=p<.28);clouds.forEach(c=>{c.visible=p<.3;c.position.x+=c.userData.v*.016;if(c.position.x>40)c.position.x=-40});
   pollen.visible=p<.3;
   if(pollen.visible){const a=polG.attributes.position.array;
     for(let i=0;i<NPOL;i++){a[i*3]+=Math.sin(t*.6+polD[i])*.004+.006;a[i*3+1]+=Math.cos(t*.5+polD[i])*.003;if(a[i*3]>13)a[i*3]=-13}
