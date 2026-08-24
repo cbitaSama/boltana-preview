@@ -1,13 +1,14 @@
 // Armador: gránulo 3D (relieve + inclusiones + drag) y POLVO v2 (montículo con
 // relieve, polvillo superficial, chorro con dispersión, impacto y finos en el aire).
 // Lee window.__granState (mutado por index.html) y window.__granDirty.
-import * as T from './vendor/three.module.js';
+import * as T from './vendor/three.module.min.js';
 const lerp=(a,b,t)=>a+(b-a)*t;
 function seeded(s){return()=>{s=(s*16807)%2147483647;return(s-1)/2147483646}}
 const canvas=document.getElementById('gran');
 if(canvas){
 const renderer=new T.WebGLRenderer({canvas,antialias:true,alpha:true});
-renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+const LOW=matchMedia('(pointer:coarse)').matches||innerWidth<720;
+renderer.setPixelRatio(Math.min(devicePixelRatio,LOW?1.5:2));
 renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.NeutralToneMapping;renderer.toneMappingExposure=1.05;
 const scene=new T.Scene();
 const cam=new T.PerspectiveCamera(34,1,.1,50);cam.position.set(0,.35,4.6);cam.lookAt(0,-.05,0);
@@ -27,20 +28,26 @@ function dotTex(){const c=document.createElement('canvas');c.width=c.height=64;c
   const rg=g.createRadialGradient(32,32,0,32,32,30);rg.addColorStop(0,'rgba(255,255,255,1)');rg.addColorStop(1,'rgba(255,255,255,0)');
   g.fillStyle=rg;g.beginPath();g.arc(32,32,30,0,7);g.fill();return new T.CanvasTexture(c)}
 const DOT=dotTex();
+function mottleTex(){const c=document.createElement('canvas');c.width=c.height=512;const g=c.getContext('2d');
+  g.fillStyle='#e9e1cd';g.fillRect(0,0,512,512);const r=seeded(21);
+  for(let i=0;i<900;i++){const t=r();g.fillStyle=t<.5?`rgba(160,148,120,${.05+r()*.09})`:`rgba(190,178,150,${.05+r()*.08})`;
+    g.beginPath();g.ellipse(r()*512,r()*512,2+r()*22,2+r()*14,r()*3.14,0,7);g.fill()}
+  for(let i=0;i<1600;i++){g.fillStyle=`rgba(90,80,62,${.08+r()*.14})`;g.fillRect(r()*512,r()*512,1.2,1.2)}
+  const t=new T.CanvasTexture(c);t.colorSpace=T.SRGBColorSpace;t.wrapS=t.wrapT=T.RepeatWrapping;return t}
 
 // ---------- GRÁNULO ----------
 function bumpR(nx,ny,nz){return 1+noise(nx,ny,nz)*.05}
-const geo=new T.SphereGeometry(1,128,86);
+const geo=new T.SphereGeometry(1,LOW?72:128,LOW?48:86);
 {const p=geo.attributes.position,v=new T.Vector3();
  for(let i=0;i<p.count;i++){v.set(p.getX(i),p.getY(i),p.getZ(i)).normalize();const r=bumpR(v.x,v.y,v.z);p.setXYZ(i,v.x*r,v.y*r,v.z*r)}
  geo.computeVertexNormals()}
-const gran=new T.Mesh(geo,new T.MeshPhysicalMaterial({color:0xded4bd,roughness:.6,clearcoat:.28,clearcoatRoughness:.5,sheen:.3,sheenColor:0xfff4dd}));
+const gran=new T.Mesh(geo,new T.MeshPhysicalMaterial({map:mottleTex(),color:0xffffff,roughness:.86,clearcoat:.06,clearcoatRoughness:.8,sheen:.12,sheenColor:0xfff4dd}));
 const spin=new T.Group();spin.add(gran);scene.add(spin);
-const NSP=170;const specks=new T.InstancedMesh(new T.SphereGeometry(1,10,8),new T.MeshStandardMaterial({roughness:.45}),NSP);
+const NSP=LOW?170:260;const specks=new T.InstancedMesh(new T.SphereGeometry(1,10,8),new T.MeshStandardMaterial({roughness:.8}),NSP);
 const sd=[];{const r2=seeded(99);const M=new T.Matrix4(),PS=new T.Vector3(),SC=new T.Vector3(),Q=new T.Quaternion();
  for(let i=0;i<NSP;i++){const u=r2()*6.283,vv=Math.acos(2*r2()-1);
   const n=new T.Vector3(Math.sin(vv)*Math.cos(u),Math.cos(vv),Math.sin(vv)*Math.sin(u));
-  const sz=.028+r2()*.05;const rad=bumpR(n.x,n.y,n.z)-sz*.45;
+  const sz=.015+r2()*.024;const rad=bumpR(n.x,n.y,n.z)-sz*.72;
   sd.push({n,sz});PS.copy(n).multiplyScalar(rad);SC.set(sz,sz,sz);M.compose(PS,Q,SC);specks.setMatrixAt(i,M)}}
 spin.add(specks);
 function shadowTex(){const c=document.createElement('canvas');c.width=c.height=256;const g=c.getContext('2d');
@@ -54,7 +61,7 @@ const powderG=new T.Group();powderG.visible=false;scene.add(powderG);
 const R=1.5,SQ=.58,BASE=-1.45;
 const heapH=(x,z)=>{const d=Math.hypot(x,z);return d>=R?BASE:BASE+SQ*Math.sqrt(Math.max(0,1-(d/R)*(d/R)))*(1+noise(x*.9,0,z*.9)*.06)}
 // monticulo con relieve y vertex colors
-const heapGeo=new T.SphereGeometry(R,64,30,0,Math.PI*2,0,Math.PI/2);
+const heapGeo=new T.SphereGeometry(R,LOW?40:64,LOW?20:30,0,Math.PI*2,0,Math.PI/2);
 {const p=heapGeo.attributes.position,v=new T.Vector3();
  for(let i=0;i<p.count;i++){v.set(p.getX(i),p.getY(i),p.getZ(i)).normalize();
   const r2=R*(1+noise(v.x*2.4,v.y*2.4,v.z*2.4)*.07+noise(v.x*7,v.y*7,v.z*7)*.02);
@@ -66,14 +73,14 @@ const heapGeo=new T.SphereGeometry(R,64,30,0,Math.PI*2,0,Math.PI/2);
 const heap=new T.Mesh(heapGeo,new T.MeshStandardMaterial({vertexColors:true,roughness:1,color:0xf3e9d2}));
 heap.scale.set(1,SQ,1);heap.position.y=BASE;powderG.add(heap);
 // polvillo superficial (granulado fino sobre el monticulo)
-const NSF=2600;const sfP=new Float32Array(NSF*3),sfC=new Float32Array(NSF*3),sfSeed=seeded(7);
+const NSF=LOW?1300:2600;const sfP=new Float32Array(NSF*3),sfC=new Float32Array(NSF*3),sfSeed=seeded(7);
 for(let i=0;i<NSF;i++){const a=sfSeed()*6.283,d=Math.pow(sfSeed(),.6)*R*.99;
   const x=Math.cos(a)*d,z=Math.sin(a)*d;sfP.set([x,heapH(x,z)+.008+sfSeed()*.015,z],i*3)}
 const sfG=new T.BufferGeometry();sfG.setAttribute('position',new T.BufferAttribute(sfP,3));sfG.setAttribute('color',new T.BufferAttribute(sfC,3));
 const surf=new T.Points(sfG,new T.PointsMaterial({map:DOT,size:.035,vertexColors:true,transparent:true,depthWrite:false,alphaTest:.05}));
 powderG.add(surf);
 // chorro cayendo con dispersion
-const NST=260;const stP=new Float32Array(NST*3),stC=new Float32Array(NST*3),stD=[];
+const NST=LOW?150:260;const stP=new Float32Array(NST*3),stC=new Float32Array(NST*3),stD=[];
 {const r4=seeded(31);for(let i=0;i<NST;i++){stD.push({a:r4()*6.283,r0:r4()*.09,spd:.9+r4()*.9,off:r4()*3,wob:r4()*6.283});stP.set([0,10,0],i*3)}}
 const stG=new T.BufferGeometry();stG.setAttribute('position',new T.BufferAttribute(stP,3));stG.setAttribute('color',new T.BufferAttribute(stC,3));
 const stream=new T.Points(stG,new T.PointsMaterial({map:DOT,size:.055,vertexColors:true,transparent:true,depthWrite:false,alphaTest:.05}));
@@ -87,7 +94,7 @@ const puffs=[];for(let i=0;i<6;i++){const sp=new T.Sprite(new T.SpriteMaterial({
  const lip=new T.Mesh(new T.TorusGeometry(.46,.028,8,28),new T.MeshStandardMaterial({color:0x453728,roughness:.5}));
  lip.rotation.x=Math.PI/2;lip.position.y=2.26;powderG.add(lip)}
 // finos flotando
-const NFN=280;const fnP=new Float32Array(NFN*3),fnD=[];const fnSeed=seeded(13);
+const NFN=LOW?140:280;const fnP=new Float32Array(NFN*3),fnD=[];const fnSeed=seeded(13);
 for(let i=0;i<NFN;i++){fnP.set([(fnSeed()-.5)*3,BASE+.1+fnSeed()*2.4,(fnSeed()-.5)*2.4],i*3);fnD.push(fnSeed()*6.283)}
 const fnG=new T.BufferGeometry();fnG.setAttribute('position',new T.BufferAttribute(fnP,3));
 const fines=new T.Points(fnG,new T.PointsMaterial({map:DOT,color:0xcfc2a4,size:.022,transparent:true,opacity:.35,depthWrite:false}));
@@ -129,7 +136,7 @@ function snapshotCards(){const cards=window.__CARDS;if(!cards||!cards.length)ret
     specks.instanceColor.needsUpdate=true;spin.rotation.y=r6()*6.28;
     off.render(scene,oc);
     const cv=cd.canvas;cv.width=620;cv.height=540;cv.getContext('2d').drawImage(off.domElement,0,0)});
-  off.dispose();gran.material.color.set(0xded4bd);window.__granDirty=true}
+  off.dispose();gran.material.color.set(0xffffff);window.__granDirty=true}
 let snapped=false,didFirst=false;
 
 // ---------- loop ----------

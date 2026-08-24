@@ -1,7 +1,7 @@
 // Boltana — escena del descenso (Three.js). Cada "modelo" está armado por separado:
 // cielo, nubes, campo de trigo con viento, polen, suelo, estratos, raíces (tubos),
 // piedras, gránulos con nutrientes, flujo de absorción y gránulo héroe que se disuelve.
-import * as T from './vendor/three.module.js';
+import * as T from './vendor/three.module.min.js';
 
 const NUT_COLORS=[0xe8c547,0xe0d6c3,0xd98b5b,0x7d8fb6,0x9bc39e,0x9aa5ab,0xb26a8a];
 const lerp=(a,b,t)=>a+(b-a)*t, clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -108,15 +108,15 @@ const wparts=[];
 {const g=new T.CylinderGeometry(0.009,0.017,1,6);
  bakeColor(g,(c,x,y)=>{c.setHSL(.24,.5,lerp(.16,.34,y+.5))});wparts.push({geo:g,mat:0})}
 // espiga: 11 granos alternados + corona
-{for(let i=0;i<11;i++){const y=0.50+i*0.028;const side=i%2?1:-1;
-  const g=new T.SphereGeometry(0.024,6,5);g.scale(1,1.85,.82);g.rotateZ(side*0.48);
+{const NGR=LOW?7:11;for(let i=0;i<NGR;i++){const y=0.50+i*(LOW?0.042:0.028);const side=i%2?1:-1;
+  const g=LOW?new T.SphereGeometry(0.027,5,4):new T.SphereGeometry(0.024,6,5);g.scale(1,1.85,.82);g.rotateZ(side*0.48);
   g.translate(side*0.026,y,(i%3-1)*0.008);
   const tint=.86+((i*37)%10)*.012;
   bakeColor(g,(c)=>{c.setRGB(.82*tint,.66*tint,.3*tint)});wparts.push({geo:g,mat:0})}
  const top=new T.SphereGeometry(0.022,6,5);top.scale(1,1.9,.8);top.translate(0,0.80,0);
  bakeColor(top,(c)=>{c.setRGB(.8,.64,.28)});wparts.push({geo:top,mat:0})}
 // aristas (pelitos de la espiga)
-{for(let i=0;i<6;i++){const g=new T.ConeGeometry(0.0035,0.34,3);const a=(i/6)*6.28;
+if(!LOW){for(let i=0;i<6;i++){const g=new T.ConeGeometry(0.0035,0.34,3);const a=(i/6)*6.28;
   g.rotateZ(Math.sin(a)*.22);g.rotateX(Math.cos(a)*.22);g.translate(Math.sin(a)*.03,0.86,Math.cos(a)*.03);
   bakeColor(g,(c)=>{c.setRGB(.82,.7,.38)});wparts.push({geo:g,mat:0})}}
 // hojas con curva y gradiente
@@ -126,15 +126,15 @@ function leafHD(sign){const g=new T.PlaneGeometry(0.13,0.55,1,5);const p=g.attri
     p.setZ(i,Math.pow(y+0.27,2)*0.42)}
   g.rotateZ(sign*-0.55);g.translate(sign*0.05,0.0,0);if(sign<0)g.rotateY(Math.PI*0.65);
   bakeColor(g,(c,x,y)=>{c.setHSL(.25,.48,lerp(.18,.36,clamp(y+.5,0,1)))});return g}
-wparts.push({geo:leafHD(1),mat:0},{geo:leafHD(-1),mat:0});
+wparts.push({geo:leafHD(1),mat:0});if(!LOW)wparts.push({geo:leafHD(-1),mat:0});
 const wheatGeo=mergeGeoms(wparts);
 const wheatMat=windify(new T.MeshStandardMaterial({vertexColors:true,roughness:.78,side:T.DoubleSide}));
-const NB=LOW?950:1800;const wheat=new T.InstancedMesh(wheatGeo,wheatMat,NB);
+const NB=LOW?680:1800;const wheat=new T.InstancedMesh(wheatGeo,wheatMat,NB);
 {const m=new T.Matrix4(),q=new T.Quaternion(),e=new T.Euler(),ps=new T.Vector3(),sc=new T.Vector3(),col=new T.Color();
  let i=0,guard=0;
  while(i<NB&&guard++<40000){const x=(rnd()-.5)*30,z=-16+rnd()*23,h=.9+rnd()*.7;
   if((Math.abs(x-0.35)<1.7&&z>0.6&&z<8.6)||Math.hypot(x-0.35,z-3.4)<2.4)continue; // sendero por donde baja la camara
-  e.set((rnd()-.5)*.14,rnd()*6.28,(rnd()-.5)*.14);q.setFromEuler(e);ps.set(x,h/2-.02,z);sc.set(1,h,1);
+  e.set((rnd()-.5)*.14,rnd()*6.28,(rnd()-.5)*.14);q.setFromEuler(e);ps.set(x,h/2-.02+terrainH(x,z),z);sc.set(1,h,1);
   m.compose(ps,q,sc);wheat.setMatrixAt(i,m);
   const l=.78+rnd()*.32;col.setRGB(l,l*(0.96+rnd()*.08),l);wheat.setColorAt(i,col);i++}
  wheat.instanceColor.needsUpdate=true}
@@ -164,7 +164,13 @@ function groundTex(){const c=document.createElement('canvas');c.width=c.height=1
     g.beginPath();g.ellipse(r()*1024,r()*1024,3+r()*26,2+r()*14,r()*3.14,0,7);g.fill()}
   for(let i=0;i<4000;i++){g.fillStyle=`rgba(${40+r()*40|0},${52+r()*30|0},${20+r()*18|0},${.3+r()*.4})`;g.fillRect(r()*1024,r()*1024,1.5,1.5+r()*3)}
   const t=new T.CanvasTexture(c);t.colorSpace=T.SRGBColorSpace;t.wrapS=t.wrapT=T.RepeatWrapping;t.repeat.set(5,5);return t}
-const ground=new T.Mesh(new T.CircleGeometry(45,48),new T.MeshStandardMaterial({map:groundTex(),roughness:1,side:T.DoubleSide}));
+function terrainH(x,z){const d=Math.hypot(x-0.35,z-3.2);const amp=smooth(5,12,d);
+  return amp*((Math.sin(x*.14+1.7)+Math.sin(z*.11+.4))*.32+Math.sin(x*.31+z*.23)*.16)}
+const groundGeo=new T.PlaneGeometry(90,90,88,88);
+{const p=groundGeo.attributes.position;
+ for(let i=0;i<p.count;i++){p.setZ(i,terrainH(p.getX(i),-p.getY(i)))}
+ groundGeo.computeVertexNormals()}
+const ground=new T.Mesh(groundGeo,new T.MeshStandardMaterial({map:groundTex(),roughness:1,side:T.DoubleSide}));
 ground.rotation.x=-Math.PI/2;if(!LOW)ground.receiveShadow=true;scene.add(ground);
 const crust=new T.Mesh(new T.BoxGeometry(90,0.5,90),new T.MeshStandardMaterial({color:0x3a2718,roughness:1}));crust.position.y=-0.27;scene.add(crust);
 
