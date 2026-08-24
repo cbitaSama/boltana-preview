@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boltana Group — Nutrición granulada para la tierra</title>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Organization","name":"Boltana Group S.R.L.","email":"boltanagroupsrl@gmail.com","telephone":"+59175375488","address":{"@type":"PostalAddress","addressLocality":"Santa Cruz de la Sierra","addressCountry":"BO"},"description":"Fabricante boliviano de fertilizantes y enmiendas granuladas (2–5 mm) y en polvo: azufre, calcio, boro, fósforo, magnesio y micronutrientes."}
+</script>
+<meta name="description" content="Fertilizantes y enmiendas granuladas fabricadas en Bolivia. Azufre, calcio, boro, fósforo y más — cada gránulo lleva el nutriente exacto. Armá tu propia fórmula.">
+<meta name="theme-color" content="#1a120b">
+<meta property="og:title" content="Boltana Group — La tierra se alimenta de a gránulo">
+<meta property="og:description" content="Fertilizantes granulados 2–5 mm hechos en Santa Cruz. Armá tu propio granulado con los nutrientes que tu suelo necesita.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%BE%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..700,0..100&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sky:#dfe9ef; --sky2:#a9c6d6; --sun:#f6e7b8;
+  --field:#6da34d; --field2:#3f6f2c;
+  --soil:#1a120b; --soil2:#2c1d12; --soil3:#4a3221;
+  --cream:#f3ead8; --ochre:#c8973f; --sulfur:#e8c547; --leaf:#8cc16b;
+  --ink:#14100c;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+:focus-visible{outline:2px solid var(--sulfur);outline-offset:3px;border-radius:4px}
+html{scroll-behavior:smooth}
+body{font-family:Inter,system-ui,sans-serif;color:var(--cream);background:var(--soil);overflow-x:hidden}
+h1,h2,h3,.serif{font-family:Fraunces,Georgia,serif;font-variation-settings:"SOFT" 60;font-weight:400;letter-spacing:-.01em}
+a{color:inherit}
+canvas{display:block}
+
+/* grano filmico + vineta */
+.vignette{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 42%,transparent 58%,rgba(10,7,4,.38) 100%)}
+.grain{position:absolute;inset:-100px;pointer-events:none;opacity:.05;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E");animation:grain 1.2s steps(4) infinite}
+@keyframes grain{0%{transform:translate(0,0)}25%{transform:translate(-30px,40px)}50%{transform:translate(40px,-25px)}75%{transform:translate(-25px,-40px)}}
+
+@media (prefers-reduced-motion:reduce){
+  .grain{animation:none}
+  .hero-copy h1,.hero-copy p,.hero-copy .cta{animation:none}
+  .hero-copy .cta i{animation:none}
+  html{scroll-behavior:auto}
+}
+/* velo de carga */
+#veil{position:fixed;inset:0;z-index:90;background:var(--soil);transition:opacity .9s ease .15s;pointer-events:none;animation:veilout 1s ease 4s forwards}
+@keyframes veilout{to{opacity:0;visibility:hidden}}
+html.scene-on #veil{opacity:0}
+
+/* medidor de profundidad */
+.depth{position:absolute;right:clamp(16px,3vw,44px);bottom:44px;display:flex;align-items:center;gap:12px;opacity:0;transition:opacity .5s;pointer-events:none}
+.depth.on{opacity:1}
+.depth i{display:block;width:1px;height:74px;background:linear-gradient(180deg,transparent,var(--ochre),transparent)}
+.depth b{display:block;font-family:Fraunces,serif;font-weight:500;font-size:26px;color:var(--cream);line-height:1}
+.depth span{font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--ochre)}
+
+/* NAV */
+nav{position:fixed;inset:0 0 auto 0;z-index:50;display:flex;justify-content:space-between;align-items:center;padding:20px 36px;mix-blend-mode:difference;color:#fff}
+nav .logo{font-family:Fraunces,serif;font-size:22px;letter-spacing:.12em;text-transform:uppercase}
+nav .logo small{display:block;font-size:10px;letter-spacing:.4em;opacity:.8}
+nav ul{display:flex;gap:28px;list-style:none;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+nav a{text-decoration:none;opacity:.85;padding-bottom:3px;border-bottom:1px solid transparent}
+nav a.act{opacity:1;border-bottom-color:currentColor}
+@media(max-width:720px){nav{padding:14px 18px}nav .logo{font-size:17px}nav .logo small{font-size:8px;letter-spacing:.3em}nav ul{gap:12px;font-size:10px;letter-spacing:.04em}nav ul li:first-child{display:none}}
+
+/* ===== ACT 1: hero + descenso (sticky canvas) ===== */
+#descent{position:relative;height:600vh}
+#descent .stage{position:sticky;top:0;height:100vh;overflow:hidden}
+#scene{position:absolute;inset:0;width:100%;height:100%}
+.hero-copy{position:absolute;inset:0;display:grid;place-items:center;text-align:center;pointer-events:none;color:var(--ink)}
+.hero-copy>div{padding:40px 60px;border-radius:50%;background:radial-gradient(ellipse at center,rgba(238,241,230,.55) 20%,rgba(238,241,230,0) 70%)}
+.hero-copy h1{font-size:clamp(44px,7.2vw,124px);line-height:.92;font-variation-settings:"SOFT" 100,"opsz" 144;font-weight:300}
+.hero-copy h1 em{font-style:italic;font-weight:500;color:var(--field2)}
+.hero-copy p{margin-top:22px;font-size:clamp(15px,1.4vw,19px);max-width:520px;margin-inline:auto;opacity:.75}
+.hero-copy .cta{margin-top:34px;display:inline-flex;align-items:center;gap:12px;font-size:13px;letter-spacing:.2em;text-transform:uppercase;opacity:.8}
+.hero-copy .cta i{width:1px;height:48px;background:currentColor;display:block;animation:drop 1.8s ease-in-out infinite}
+@keyframes rise{from{opacity:0;transform:translateY(46px)}to{opacity:1;transform:none}}
+.hero-copy h1{animation:rise 1.3s .15s cubic-bezier(.2,.8,.2,1) both}
+.hero-copy p{animation:rise 1.1s .5s cubic-bezier(.2,.8,.2,1) both}
+.hero-copy .cta{animation:rise 1s .85s cubic-bezier(.2,.8,.2,1) both}
+@keyframes drop{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+/* captions that appear during the descent */
+.caption{position:absolute;left:clamp(24px,8vw,120px);top:50%;transform:translateY(-50%);max-width:460px;opacity:0;transition:opacity .5s,transform .6s;pointer-events:none}
+.caption.right{left:auto;right:clamp(24px,8vw,120px);text-align:right}
+.caption.on{opacity:1}
+.caption .k{display:flex;align-items:center;gap:14px;font-size:11px;letter-spacing:.35em;text-transform:uppercase;color:var(--ochre);margin-bottom:16px}
+.caption .k::after{content:'';flex:1;max-width:90px;height:1px;background:linear-gradient(90deg,var(--ochre),transparent)}
+.caption.right .k{justify-content:flex-end}
+.caption.right .k::after{order:-1;background:linear-gradient(270deg,var(--ochre),transparent)}
+.caption h2{font-size:clamp(34px,4.6vw,66px);line-height:1;margin-bottom:16px}
+.caption p{font-size:16px;line-height:1.55;opacity:.8}
+
+/* nutrient tags drawn in HTML over canvas */
+.tag{position:absolute;transform:translate(-50%,-50%);display:flex;align-items:center;gap:10px;opacity:0;transition:opacity .4s;pointer-events:none}
+.tag.on{opacity:1}
+.tag b{font-family:Fraunces,serif;font-weight:500;font-size:20px;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--cream);color:var(--soil)}
+.tag span{font-size:12px;letter-spacing:.1em;text-transform:uppercase;background:rgba(20,16,12,.55);padding:6px 10px;border-radius:4px;backdrop-filter:blur(6px)}
+
+/* ===== ACT 2: elementos ===== */
+section.block{padding:clamp(80px,12vw,160px) clamp(24px,7vw,110px)}
+.eyebrow{font-size:11px;letter-spacing:.35em;text-transform:uppercase;color:var(--ochre);margin-bottom:18px}
+.block h2{font-size:clamp(36px,5vw,72px);line-height:1;max-width:14ch}
+.block .lede{margin-top:20px;max-width:56ch;font-size:17px;line-height:1.6;opacity:.75}
+
+.periodic{margin-top:64px;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.el{aspect-ratio:1;border:1px solid rgba(243,234,216,.14);padding:14px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;cursor:default;transition:transform .35s cubic-bezier(.2,.8,.2,1),border-color .3s;background:linear-gradient(160deg,rgba(255,255,255,.03),transparent)}
+.el::after{content:"";position:absolute;inset:auto -40% -40% auto;width:120%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,var(--c) 0%,transparent 60%);opacity:0;transition:opacity .5s}
+.el:hover{transform:translateY(-6px);border-color:var(--c)}
+.el:hover::after{opacity:.55}
+.el .num{font-size:11px;opacity:.5}
+.el .sym{font-family:Fraunces,serif;font-size:44px;line-height:1;font-weight:500}
+.el .name{font-size:12px;letter-spacing:.06em;text-transform:uppercase;opacity:.8}
+.el .role{font-size:11px;opacity:.55;line-height:1.35;margin-top:4px}
+.eln{position:absolute;top:10px;right:12px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--c);opacity:0;transition:opacity .3s}
+.el:hover .eln{opacity:1}
+.el{--c:var(--ochre)}
+
+/* proceso */
+#proceso{background:var(--soil2)}
+.steps{margin-top:64px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:34px;position:relative}
+.steps::before{content:"";position:absolute;top:34px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(200,151,63,.5),transparent);transform:scaleX(0);transition:transform 1.4s cubic-bezier(.2,.8,.2,1) .3s}
+.steps.in::before{transform:scaleX(1)}
+.step svg{width:68px;height:68px;fill:none;stroke:var(--ochre);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;background:var(--soil);border:1px solid rgba(243,234,216,.14);border-radius:50%;padding:14px;position:relative;z-index:1}
+.step b{display:block;font-family:Fraunces,serif;font-weight:500;font-size:19px;margin:16px 0 8px}
+.step p{font-size:14px;line-height:1.55;opacity:.7;max-width:30ch}
+.stats{margin-top:80px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:20px;border-top:1px solid rgba(243,234,216,.12);padding-top:44px}
+.stat b{font-family:Fraunces,serif;font-weight:400;font-size:clamp(38px,4.5vw,62px);display:block;line-height:1}
+.stat b i{font-style:normal;font-size:.45em;color:var(--ochre);margin-left:4px}
+.stat>span{font-size:12px;letter-spacing:.18em;text-transform:uppercase;opacity:.6}
+
+/* ===== ACT 3: productos ===== */
+#productos{background:var(--cream);color:var(--ink)}
+#productos .eyebrow{color:var(--field2)}
+.grid{margin-top:56px;display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:18px}
+.card{background:#fff;border-radius:18px;padding:26px 24px 22px;position:relative;overflow:hidden;box-shadow:0 1px 0 rgba(0,0,0,.04),0 20px 40px -30px rgba(20,16,12,.4);transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+.card:hover{transform:translateY(-6px)}
+.card canvas{width:100%;aspect-ratio:1.15;border-radius:12px;background:#f5f1e8}
+.card h3{font-size:26px;margin-top:18px}
+.card .cod{font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:.5}
+.card p{font-size:14px;line-height:1.5;opacity:.75;margin-top:8px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.card .more{margin-top:16px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--field2);opacity:0;transform:translateY(4px);transition:.35s}
+.card:hover .more{opacity:1;transform:none}
+.chip{font-size:12px;padding:5px 9px;border-radius:999px;background:var(--ink);color:var(--cream)}
+.chip.s{background:var(--sulfur);color:var(--ink)}
+.chip.b{background:#7d8fb6;color:#fff}
+.chip.ca{background:#e0d6c3;color:var(--ink)}
+.chip.p{background:#d98b5b;color:#fff}
+.chip.mo{background:#4a3221;color:#fff}
+.chip.mg{background:#9bc39e;color:var(--ink)}
+.chip.zn{background:#9aa5ab;color:#fff}
+.chip.mn{background:#b26a8a;color:#fff}
+
+/* filtro por elemento */
+.el{cursor:pointer}
+.fpill{display:inline-flex;align-items:center;gap:12px;margin-top:28px;padding:10px 16px;border-radius:999px;background:var(--ink);color:var(--cream);font-size:13px}
+.fpill button{border:0;background:transparent;color:var(--sulfur);font:inherit;cursor:pointer}
+.card{transition:transform .4s cubic-bezier(.2,.8,.2,1),opacity .4s,filter .4s}
+.card.dim{opacity:.3;filter:grayscale(.5)}
+.card.match{box-shadow:0 0 0 2px var(--field2),0 20px 40px -28px rgba(20,16,12,.5)}
+.card::before{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 42%,rgba(255,255,255,.4) 50%,transparent 58%);transform:translateX(-130%);pointer-events:none;z-index:2}
+.card:hover::before{transition:transform .9s ease;transform:translateX(130%)}
+.card canvas{transition:transform .55s cubic-bezier(.2,.8,.2,1)}
+.card:hover canvas{transform:scale(1.06)}
+/* pasos escalonados */
+.steps .step{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.8,.2,1)}
+.steps.in .step{opacity:1;transform:none}
+.steps .step:nth-child(2){transition-delay:.15s}.steps .step:nth-child(3){transition-delay:.3s}.steps .step:nth-child(4){transition-delay:.45s}
+/* presets */
+.presets-label{margin-top:26px;font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:var(--ochre)}
+.presets{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.presets button{border:1px solid rgba(243,234,216,.22);background:transparent;color:var(--cream);font:inherit;font-size:13px;padding:8px 14px;border-radius:999px;cursor:pointer;transition:background .25s,color .25s}
+.presets button:hover,.presets button.on{background:var(--cream);color:var(--soil)}
+
+/* cultivos */
+#cultivos{background:var(--soil)}
+.crops{margin-top:44px;display:flex;flex-wrap:wrap;gap:10px}
+.crops button{border:1px solid rgba(243,234,216,.22);background:transparent;color:var(--cream);font:inherit;font-size:15px;padding:12px 20px;border-radius:999px;cursor:pointer;display:flex;align-items:center;gap:9px;transition:background .25s,color .25s,transform .25s}
+.crops button:hover{transform:translateY(-2px)}
+.crops button.on{background:var(--sulfur);color:var(--ink);border-color:var(--sulfur)}
+.program{margin-top:40px}
+.prog-head .k{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--ochre);display:block;margin-bottom:6px}
+.prog-head b{font-family:Fraunces,serif;font-weight:500;font-size:clamp(28px,3.5vw,44px)}
+.prog-grid{margin-top:24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.prog-card{border:1px solid rgba(243,234,216,.15);border-radius:16px;padding:20px;background:rgba(0,0,0,.22);cursor:pointer;transition:transform .3s,border-color .3s}
+.prog-card:hover{transform:translateY(-4px);border-color:var(--ochre)}
+.prog-card .fase{font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--leaf)}
+.prog-card h4{font-family:Fraunces,serif;font-weight:500;font-size:24px;margin:8px 0 6px}
+.prog-card p{font-size:13px;line-height:1.5;opacity:.7}
+.prog-note{margin-top:20px;font-size:13px;opacity:.6}
+.prog-note a{color:var(--sulfur)}
+
+/* ===== ACT 4: armá tu granulado ===== */
+#builder{background:var(--soil2)}
+.builder{margin-top:56px;display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:start}
+@media(max-width:900px){.builder{grid-template-columns:1fr}.viz{position:static;max-width:480px;width:100%;margin-inline:auto}}
+@media(max-width:700px){
+  .nutri{grid-template-columns:1fr;gap:16px}
+}
+@media(max-width:560px){
+  section.block{padding:70px 20px}
+  .seg{width:100%}.seg button{flex:1}
+  .viz .readout b{font-size:20px}
+  .caption{max-width:76vw}.caption h2{font-size:30px}.caption p{font-size:14px}
+  .tag b{width:34px;height:34px;font-size:15px}.tag span{font-size:10px;padding:4px 7px}
+  .field label{font-size:11px;gap:8px}
+  .field label output{font-size:15px}
+  .result h4{font-size:24px}
+  .hero-copy>div{padding:20px 10px}
+}
+.viz{position:sticky;top:90px;border-radius:24px;background:radial-gradient(ellipse at 50% 30%,#3a2818,#150e08 70%);aspect-ratio:1;overflow:hidden;box-shadow:inset 0 0 80px rgba(0,0,0,.6)}
+.viz canvas{width:100%;height:100%}
+.viz .readout{position:absolute;left:22px;bottom:20px;font-size:12px;letter-spacing:.15em;text-transform:uppercase;opacity:.7}
+.viz .readout b{display:block;font-family:Fraunces,serif;font-size:30px;letter-spacing:0;text-transform:none;font-weight:500;color:var(--cream)}
+.panel h3{font-size:30px;margin-bottom:8px}
+.panel .hint{font-size:14px;opacity:.65;line-height:1.5}
+.seg{display:flex;gap:6px;margin:22px 0 10px;background:rgba(255,255,255,.06);padding:5px;border-radius:12px;width:max-content}
+.seg button{border:0;background:transparent;color:var(--cream);padding:10px 18px;border-radius:9px;font:inherit;font-size:14px;cursor:pointer;opacity:.6}
+.seg button.on{background:var(--cream);color:var(--soil);opacity:1}
+.field{margin-top:22px}
+.field label{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;opacity:.85;margin-bottom:8px;line-height:1.3}
+.field label>span{min-width:0}
+.field label output{white-space:nowrap;flex-shrink:0}
+.field label output{font-family:Fraunces,serif;font-size:18px;letter-spacing:0;text-transform:none;color:var(--ochre)}
+input[type=range]{width:100%;appearance:none;height:3px;background:rgba(255,255,255,.15);border-radius:2px;outline:0}
+input[type=range]::-webkit-slider-thumb{appearance:none;width:22px;height:22px;border-radius:50%;background:var(--cream);border:5px solid var(--soil2);box-shadow:0 0 0 1px var(--ochre);cursor:pointer}
+.nutri{margin-top:30px;display:grid;grid-template-columns:repeat(2,1fr);gap:14px 22px}
+.nutri .field{margin:0}
+.nutri .field label{font-size:12px}
+.result{margin-top:34px;padding:22px;border:1px solid rgba(243,234,216,.15);border-radius:16px;background:rgba(0,0,0,.2)}
+.result .k{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--ochre)}
+.result h4{font-family:Fraunces,serif;font-size:28px;font-weight:500;margin:8px 0 6px}
+.result p{font-size:14px;opacity:.7;line-height:1.5}
+.result .bar{margin-top:14px;height:6px;border-radius:3px;background:rgba(255,255,255,.1);overflow:hidden}
+.result .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--ochre),var(--sulfur));width:0;transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.quote-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.quote-row .btn{margin-top:0}
+.btn.ghost2{background:transparent;color:var(--cream);border:1px solid rgba(243,234,216,.3);cursor:pointer;font:inherit;font-weight:600;font-size:14px}
+.btn{margin-top:22px;display:inline-block;padding:16px 26px;border-radius:999px;background:var(--sulfur);color:var(--ink);font-weight:600;font-size:14px;letter-spacing:.05em;text-decoration:none}
+
+.formats{margin-top:52px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:700px){.formats{grid-template-columns:1fr}}
+.fcard{border:1px solid rgba(243,234,216,.14);border-radius:16px;padding:22px;background:rgba(0,0,0,.16)}
+.fcard h3{font-size:22px;margin-bottom:8px}
+.fcard h3 small{font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--ochre);margin-left:8px}
+.fcard p{font-size:14px;line-height:1.55;opacity:.72}
+
+/* barra de composición */
+.totalbar{margin-top:26px}
+.tb-track{height:14px;border-radius:7px;overflow:hidden;display:flex;background:rgba(255,255,255,.08)}
+.tb-track i{display:block;height:100%;transition:width .35s cubic-bezier(.2,.8,.2,1)}
+.tb-line{margin-top:8px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.65}
+.tb-line b{color:var(--sulfur)}
+
+/* modal ficha */
+.modal{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:20px}
+.modal[hidden]{display:none}
+.mbg{position:absolute;inset:0;background:rgba(12,8,5,.72);backdrop-filter:blur(8px);animation:fadein .3s both}
+.mcard{position:relative;background:var(--cream);color:var(--ink);border-radius:24px;max-width:920px;width:100%;max-height:88vh;overflow:auto;display:grid;grid-template-columns:1fr 1.1fr;animation:pop .45s cubic-bezier(.2,.8,.2,1) both;box-shadow:0 40px 120px -30px rgba(0,0,0,.7)}
+@keyframes fadein{from{opacity:0}}
+@keyframes pop{from{opacity:0;transform:translateY(26px) scale(.97)}}
+@media(max-width:760px){.mcard{grid-template-columns:1fr;max-height:92vh}}
+.mviz{background:#efe9db;display:grid;place-items:center;min-height:280px}
+.mviz canvas{width:100%;max-width:440px;aspect-ratio:620/540}
+.minfo{padding:30px 30px 26px}
+.minfo .cod{font-size:11px;letter-spacing:.22em;text-transform:uppercase;opacity:.5}
+.minfo h3{font-size:34px;margin:6px 0 10px}
+.mdesc{font-size:15px;line-height:1.55;opacity:.75}
+.mt-label{margin:22px 0 10px;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--field2)}
+.mcomp{display:flex;flex-wrap:wrap;gap:6px}
+.mben{list-style:none;display:grid;gap:8px}
+.mben li{font-size:14px;line-height:1.45;padding-left:20px;position:relative;opacity:.85}
+.mben li::before{content:'✓';position:absolute;left:0;color:var(--field2);font-weight:700}
+.mprops{width:100%;border-collapse:collapse;font-size:14px}
+.mprops td{padding:8px 0;border-bottom:1px solid rgba(20,16,12,.1)}
+.mprops td:last-child{text-align:right;font-weight:600}
+.mquote{margin-top:24px}
+.mx{position:absolute;top:14px;right:16px;z-index:2;border:0;background:var(--ink);color:var(--cream);width:38px;height:38px;border-radius:50%;font-size:20px;cursor:pointer}
+
+/* ===== footer ===== */
+footer{padding:110px clamp(24px,7vw,110px) 50px;border-top:1px solid rgba(243,234,216,.1)}
+footer .big{font-family:Fraunces,serif;font-size:clamp(44px,8vw,120px);line-height:.92;letter-spacing:-.02em;margin-bottom:36px}
+.foot-cta{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:64px}
+.foot-cta .btn{margin-top:0}
+.btn.ghost{background:transparent;color:var(--cream);border:1px solid rgba(243,234,216,.3)}
+.foot-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;font-size:13px;line-height:1.6;opacity:.6;border-top:1px solid rgba(243,234,216,.1);padding-top:28px}
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .9s ease,transform .9s cubic-bezier(.2,.8,.2,1)}
+.reveal.in{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<div id="veil"></div>
+<script>addEventListener('error',function(e){var d=document.getElementById('errbadge');if(!d){d=document.createElement('div');d.id='errbadge';d.style.cssText='position:fixed;left:10px;bottom:10px;z-index:99;background:#7a1d1d;color:#fff;font:11px/1.4 monospace;padding:8px 10px;border-radius:8px;max-width:80vw;white-space:pre-wrap';document.body.appendChild(d)}d.textContent+=(e.message||e.type)+'\n'});</script>
+<nav>
+  <div class="logo">Boltana<small>Group · Santa Cruz</small></div>
+  <ul><li><a href="#elementos">Nutrientes</a></li><li><a href="#productos">Productos</a></li><li><a href="#builder">Armá tu granulado</a></li><li><a href="#contacto">Contacto</a></li></ul>
+</nav>
+
+<!-- ACT 1 -->
+<section id="descent">
+  <div class="stage">
+    <canvas id="scene" role="img" aria-label="Descenso animado por la tierra: cultivo, raíces y gránulos de Boltana"></canvas>
+    <div class="vignette"></div><div class="grain"></div>
+    <div class="depth" id="depth"><i></i><div><b id="depthM">0,0 m</b><span id="depthZone">Superficie</span></div></div>
+    <div class="hero-copy" id="heroCopy">
+      <div>
+        <h1>La tierra<br>se alimenta <em>de a gránulo</em></h1>
+        <p>Fertilizantes y enmiendas granuladas fabricadas en Bolivia. Cada gránulo lleva el nutriente exacto, a la profundidad exacta.</p>
+        <div class="cta">Bajá a la tierra <i></i></div>
+      </div>
+    </div>
+
+    <div class="caption" data-at="0.22,0.40">
+      <div class="k">01 · Raíces</div>
+      <h2>Lo que la planta muestra arriba, lo decide abajo.</h2>
+      <p>Debajo del cultivo hay un sistema que busca calcio, azufre, boro, fósforo. Si no los encuentra, se nota en la cosecha.</p>
+    </div>
+    <div class="caption right" data-at="0.45,0.66">
+      <div class="k">02 · Gránulos</div>
+      <h2>Cada gránulo, una dosis completa.</h2>
+      <p>2 a 5 mm. Todos los nutrientes presentes en el 100% de los gránulos: distribución homogénea en el suelo y absorción uniforme por las raíces.</p>
+    </div>
+    <div class="caption" data-at="0.70,0.92">
+      <div class="k">03 · Liberación gradual</div>
+      <h2>Se disuelve al ritmo del cultivo.</h2>
+      <p>Solubilidad equilibrada: disponibilidad continua desde la siembra hasta la cosecha, sin riesgo de toxicidad.</p>
+    </div>
+
+    <div class="tag" data-at="0.48,0.70" style="left:32%;top:38%"><b>S</b><span>Azufre</span></div>
+    <div class="tag" data-at="0.50,0.70" style="left:60%;top:30%"><b>Ca</b><span>Calcio</span></div>
+    <div class="tag" data-at="0.52,0.70" style="left:44%;top:62%"><b>B</b><span>Boro</span></div>
+    <div class="tag" data-at="0.54,0.70" style="left:68%;top:58%"><b>P</b><span>Fósforo</span></div>
+    <div class="tag" data-at="0.56,0.70" style="left:24%;top:70%"><b>Mg</b><span>Magnesio</span></div>
+    <div class="tag" data-at="0.58,0.70" style="left:76%;top:78%"><b>Zn</b><span>Zinc</span></div>
+  </div>
+</section>
+
+<!-- ACT 2 -->
+<section class="block" id="elementos">
+  <div class="eyebrow reveal">Lo que llevamos al suelo</div>
+  <h2 class="reveal">Siete elementos. Un solo gránulo.</h2>
+  <p class="lede reveal">Todo lo que formulamos sale de estos elementos. Pasá el cursor para ver qué hace cada uno — y <b>tocá uno</b> para ver qué fórmulas lo llevan.</p>
+  <div class="periodic reveal">
+    <div class="el" data-k="S" style="--c:#e8c547"><span class="num">16</span><span class="sym">S</span><div><span class="name">Azufre</span><p class="role">Síntesis de proteínas · corrige suelos alcalinos · potencia el nitrógeno</p></div></div>
+    <div class="el" data-k="Ca" style="--c:#e0d6c3"><span class="num">20</span><span class="sym">Ca</span><div><span class="name">Calcio</span><p class="role">Estructura del suelo · paredes celulares · raíces profundas</p></div></div>
+    <div class="el" data-k="B" style="--c:#7d8fb6"><span class="num">5</span><span class="sym">B</span><div><span class="name">Boro</span><p class="role">Floración, cuajado y polinización · transporte de azúcares</p></div></div>
+    <div class="el" data-k="P" style="--c:#d98b5b"><span class="num">15</span><span class="sym">P</span><div><span class="name">Fósforo</span><p class="role">Arranque radicular · energía · disponible toda la campaña</p></div></div>
+    <div class="el" data-k="Mg" style="--c:#9bc39e"><span class="num">12</span><span class="sym">Mg</span><div><span class="name">Magnesio</span><p class="role">Centro de la clorofila · reduce acidez · intercambio catiónico</p></div></div>
+    <div class="el" data-k="Zn" style="--c:#9aa5ab"><span class="num">30</span><span class="sym">Zn</span><div><span class="name">Zinc</span><p class="role">Corrige deficiencias que frenan el crecimiento</p></div></div>
+    <div class="el" data-k="Mn" style="--c:#b26a8a"><span class="num">25</span><span class="sym">Mn</span><div><span class="name">Manganeso</span><p class="role">Fotosíntesis · activación enzimática</p></div></div>
+    <div class="el" data-k="MO" style="--c:#6b4a2e"><span class="num">—</span><span class="sym">MO</span><div><span class="name">Materia orgánica</span><p class="role">Leonardita + biochar · retiene humedad · vida microbiana</p></div></div>
+  </div>
+</section>
+
+<!-- PROCESO -->
+<section class="block" id="proceso">
+  <div class="eyebrow reveal">De la mina al campo</div>
+  <h2 class="reveal">Así nace un gránulo.</h2>
+  <p class="lede reveal">Minerales bolivianos seleccionados, molidos y granulados en nuestra planta de Santa Cruz. Sin intermediarios: de la fuente directo a tu suelo.</p>
+  <div class="steps reveal">
+    <div class="step"><svg viewBox="0 0 64 64"><path d="M6 50 22 22l10 14 8-10 18 24z"/><circle cx="46" cy="16" r="5"/></svg><b>01 · Mineral</b><p>Ulexita, yeso, azufre y roca fosfórica de origen boliviano, seleccionados por pureza.</p></div>
+    <div class="step"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="13"/><circle cx="32" cy="32" r="4"/><path d="M32 12v-6M32 58v-6M52 32h6M6 32h6M46 18l4-4M14 50l4-4M46 46l4 4M14 14l4 4"/></svg><b>02 · Molienda</b><p>Molido fino y dosificación de cada nutriente según la fórmula.</p></div>
+    <div class="step"><svg viewBox="0 0 64 64"><rect x="10" y="20" width="36" height="24" rx="12" transform="rotate(-8 28 32)"/><circle cx="52" cy="44" r="2.5"/><circle cx="57" cy="36" r="2"/><circle cx="54" cy="52" r="2"/></svg><b>03 · Granulación</b><p>El tambor forma gránulos esféricos de 2–5 mm con el 95% de uniformidad.</p></div>
+    <div class="step"><svg viewBox="0 0 64 64"><path d="M12 52c0-10 4-18 10-24M32 52c0-14 5-24 12-30M52 52c0-8-2-16-6-22"/><path d="M22 28c-5-2-8-6-8-12 6 0 10 3 12 8M44 22c1-6 5-10 11-11 0 7-3 11-8 13"/></svg><b>04 · Campo</b><p>Big bags de 1000 kg o bolsas de 25/50 kg, listas para aplicación directa.</p></div>
+  </div>
+  <div class="stats reveal">
+    <div class="stat"><b><span data-count="2">2</span>–<span data-count="5">5</span><i>mm</i></b><span>granulometría</span></div>
+    <div class="stat"><b><span data-count="95">0</span><i>%</i></b><span>de uniformidad</span></div>
+    <div class="stat"><b><span data-count="1000">0</span><i>kg</i></b><span>big bags</span></div>
+    <div class="stat"><b><span data-count="8">0</span></b><span>fórmulas propias</span></div>
+  </div>
+</section>
+
+<!-- PRODUCTOS -->
+<section class="block" id="productos">
+  <div class="eyebrow reveal">Catálogo</div>
+  <h2 class="reveal">Ocho fórmulas, una fábrica.</h2>
+  <p class="lede reveal">Granulado 2–5 mm (95%), big bags de 1000 kg y bolsas de 25/50 kg. Cada tarjeta muestra el gránulo real: su color y su composición.</p>
+  <div id="filterPill" class="fpill" hidden><span></span><button>× limpiar</button></div>
+  <div class="grid" id="grid"></div>
+</section>
+
+<!-- CULTIVOS -->
+<section class="block" id="cultivos">
+  <div class="eyebrow reveal">Programa recomendado</div>
+  <h2 class="reveal">¿Qué estás sembrando?</h2>
+  <p class="lede reveal">Elegí tu cultivo y te armamos el programa Boltana: la base, la corrección del suelo y el refuerzo de micronutrientes.</p>
+  <div class="crops reveal" id="crops"></div>
+  <div class="program" id="program" hidden>
+    <div class="prog-head"><span class="k">Programa sugerido para</span><b id="progCrop"></b></div>
+    <div class="prog-grid" id="progGrid"></div>
+    <p class="prog-note">* Programa orientativo. La dosis exacta depende del análisis de suelo — <a href="#contacto">escribinos</a> y lo ajustamos gratis.</p>
+  </div>
+</section>
+
+<!-- ACT 4 -->
+<section class="block" id="builder">
+  <div class="eyebrow reveal">A medida</div>
+  <h2 class="reveal">Armá tu propio granulado.</h2>
+  <p class="lede reveal">Elegí formato, tamaño y los nutrientes que necesita tu suelo. Te decimos qué fórmula de Boltana se acerca más — o te la fabricamos.</p>
+  <div class="formats reveal">
+    <div class="fcard"><h3>● Granulado <small>2–5 mm</small></h3><p>Liberación gradual, distribución pareja, sin polvo al aplicar y sin deriva por viento. Ideal para fertilización de base de ciclo completo.</p></div>
+    <div class="fcard"><h3>◦ Polvo <small>malla fina</small></h3><p>Reacción más rápida y mezcla íntima con el suelo. Ideal para correcciones puntuales y preparación de sustratos.</p></div>
+  </div>
+  <div class="builder">
+    <div class="viz reveal">
+      <canvas id="gran" role="img" aria-label="Gránulo 3D interactivo con tu fórmula — arrastrá para girarlo"></canvas>
+      <div class="readout">Granulometría<b id="sizeOut">3,5 mm</b></div>
+    </div>
+    <div class="panel reveal">
+      <h3>Tu fórmula</h3>
+      <p class="hint">Los porcentajes son sobre el peso del gránulo. Lo que falta hasta 100% es soporte mineral.</p>
+      <div class="seg" id="fmt"><button class="on" data-f="gran">Granulado</button><button data-f="polvo">Polvo</button></div>
+      <div class="field" id="sizeField"><label>Tamaño del gránulo <output id="sizeLbl">3,5 mm</output></label><input type="range" id="size" min="2" max="5" step="0.1" value="3.5"></div>
+      <div class="presets-label">Arrancá desde una fórmula:</div>
+      <div class="presets" id="presets"></div>
+      <div class="nutri" id="nutri"></div>
+      <div class="totalbar"><div class="tb-track" id="tbTrack"></div><div class="tb-line" id="tbLine"></div></div>
+      <div class="result">
+        <div class="k">Fórmula más cercana</div>
+        <h4 id="matchName">Boltmix</h4>
+        <p id="matchDesc">—</p>
+        <div class="bar"><i id="matchBar"></i></div>
+      </div>
+      <div class="quote-row"><a class="btn" href="#contacto" id="quote">Pedir cotización →</a><button class="btn ghost2" id="shareF" type="button">Copiar link de mi fórmula</button></div>
+    </div>
+  </div>
+</section>
+
+<div class="modal" id="pmodal" hidden>
+  <div class="mbg"></div>
+  <div class="mcard">
+    <button class="mx" aria-label="Cerrar">×</button>
+    <div class="mviz"><canvas id="mcanvas" width="620" height="540"></canvas></div>
+    <div class="minfo">
+      <div class="cod"></div><h3></h3><p class="mdesc"></p>
+      <div class="mt-label">Beneficios</div><ul class="mben"></ul>
+      <div class="mt-label">Composición</div><div class="mcomp"></div>
+      <div class="mt-label">Propiedades</div>
+      <table class="mprops"></table>
+      <a class="btn mquote" target="_blank">Cotizar por WhatsApp →</a>
+    </div>
+  </div>
+</div>
+
+<footer id="contacto">
+  <div class="big reveal">Hablemos<br>de tu suelo.</div>
+  <div class="foot-cta reveal">
+    <a class="btn" href="https://wa.me/59175375488?text=Hola%20Boltana%2C%20quiero%20informaci%C3%B3n%20sobre%20sus%20fertilizantes%20granulados">Escribinos por WhatsApp →</a>
+    <a class="btn ghost" href="mailto:boltanagroupsrl@gmail.com">boltanagroupsrl@gmail.com</a>
+  </div>
+  <div class="foot-meta">
+    <div>Boltana Group S.R.L.<br>Santa Cruz de la Sierra, Bolivia</div>
+    <div>+591 753 75 488<br>Big bags 1000 kg · bolsas 25/50 kg</div>
+    <div>Granulados y polvo<br>2–5 mm · 95% uniformidad</div>
+  </div>
+</footer>
+
+<script>
+/* ---------- DATA (de las fichas técnicas) ---------- */
+const PRODUCTS=[
+ {n:"Boltmix",ben:["Desarrollo radicular, floración y llenado de frutos", "Disponibilidad continua: corrige deficiencias sin picos", "Nutrientes presentes en el 100% de los gránulos"],cod:"S · Ca · Mg · Zn · B · Mn",col:"#8f9a84",d:"Liberación gradual. Seis nutrientes presentes en el 100% de los gránulos.",comp:{S:52,Ca:5.5,Mg:2.5,Zn:2.2,B:1.1,Mn:1.1},hum:"<5%",ph:"6,5–7,2"},
+ {n:"Fosbor",ben:["Fósforo sin interrupciones, del arranque a la cosecha", "Boro que mejora fecundación y cuajado", "El azufre potencia el nitrógeno aplicado"],cod:"P · S · Ca · B",col:"#d9d4c8",d:"Fósforo disponible toda la campaña, azufre y boro para cuaje y raíz.",comp:{P:25,S:15,Ca:15,B:10},hum:"<7%",ph:"4,5–6,5"},
+ {n:"Sul-Ca-Bor",ben:["Mejora propiedades físicas y químicas del suelo", "Calcio + azufre para raíz y floración", "Enriquecida con fósforo y boro"],cod:"Enmienda · P · B",col:"#d6d1c4",d:"Enmienda granulada enriquecida: calcio, azufre, fósforo y boro.",comp:{P:25,S:15,Ca:15,B:10},hum:"<7%",ph:"4,5–6,5"},
+ {n:"Base Forte",ben:["Reduce la acidez y mejora el intercambio catiónico", "Raíces más profundas y paredes celulares firmes", "Activa la vida microbiológica del suelo"],cod:"Corrector de suelo",col:"#cfc9bb",d:"Calcio y magnesio contra la acidez; boro y azufre complementan.",comp:{Ca:27,Mg:8,S:5,B:1},hum:"<7%",ph:"4,5–6,5",cult:"Soya · Maíz · Girasol · Caña · Algodón · Arroz · Frutales · Hortalizas · Pasturas"},
+ {n:"Oro-Negro",ben:["Sube la materia orgánica y retiene humedad", "Estimula la biología del suelo", "Menos lixiviación: tus fertilizantes rinden más"],cod:"Orgánico · Leonardita · Biochar",col:"#2b1d13",d:"40–50% materia orgánica, azufre y micronutrientes. Vida para el suelo.",comp:{MO:45,S:7,Ca:2,Zn:1.6,Mn:.8,B:.1},hum:"<10%",ph:"6,5–7,5",cult:"Soya · Maíz · Caña de azúcar"},
+ {n:"Ulexita Boro 10",ben:["Boro para floración, cuajado y desarrollo de frutos", "Liberación controlada, sin riesgo de toxicidad", "Aporta silicio y magnesio adicionales"],cod:"PH-B10",col:"#e6e0d2",d:"Boro de liberación controlada para floración, cuajado y frutos.",comp:{B:10,Ca:11,Mg:2.6},hum:"<7%",ph:"9,8 a 20°C",pres:"Big bags de 1000 kg"},
+ {n:"Yeso Agrícola",ben:["Reduce compactación: más aire y agua en el perfil", "Moviliza N, P, K y Zn retenidos", "Calcio de alta solubilidad para raíz profunda"],cod:"CaSO₄·2H₂O",col:"#ece7da",d:"Mejora la estructura del suelo, reduce compactación, libera N-P-K.",comp:{Ca:22,S:16,B:.7},hum:"<5%",ph:"6,5–7,5",gr:"2–5 mm (90%)",pres:"Big bags de 1000 kg"},
+ {n:"Azufre mineral",ben:["86,74% de pureza mineral", "Corrige suelos alcalinos, libera fósforo y hierro", "Oxidación gradual: sulfatos todo el ciclo"],cod:"S 86,74%",col:"#e8c547",d:"Alta pureza. Oxidación microbiológica: sulfatos constantes, baja el pH.",comp:{S:86},hum:"5%",ph:"3,0–5,5",pres:"Polvo fino o granulado"},
+];
+const NUT={S:["Azufre","#e8c547"],Ca:["Calcio","#e0d6c3"],P:["Fósforo","#d98b5b"],B:["Boro","#7d8fb6"],Mg:["Magnesio","#9bc39e"],Zn:["Zinc","#9aa5ab"],Mn:["Manganeso","#b26a8a"],MO:["Mat. orgánica","#6b4a2e"]};
+const CHIP={S:"s",Ca:"ca",P:"p",B:"b",Mg:"mg",Zn:"zn",Mn:"mn",MO:"mo"};
+
+/* ---------- helpers ---------- */
+const lerp=(a,b,t)=>a+(b-a)*t, clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const smooth=(a,b,x)=>{const t=clamp((x-a)/(b-a),0,1);return t*t*(3-2*t)};
+function seeded(s){return()=>{s=(s*16807)%2147483647;return(s-1)/2147483646}}
+
+/* ---------- modal de ficha ---------- */
+const pmodal=document.getElementById('pmodal');
+function openProduct(i){const p=PRODUCTS[i];
+  pmodal.querySelector('.cod').textContent=p.cod;
+  pmodal.querySelector('h3').textContent=p.n;
+  pmodal.querySelector('.mdesc').textContent=p.d;
+  pmodal.querySelector('.mben').innerHTML=(p.ben||[]).map(b=>`<li>${b}</li>`).join('');
+  pmodal.querySelector('.mcomp').innerHTML=Object.entries(p.comp).map(([k,v])=>`<span class="chip ${CHIP[k]}">${NUT[k][0]} · ${String(v).replace('.',',')}%</span>`).join('');
+  pmodal.querySelector('.mprops').innerHTML=[
+    ['Granulometría',p.gr||'2–5 mm (95%)'],['Humedad',p.hum||'—'],['pH',p.ph||'—'],
+    ['Presentación',p.pres||'Big bags 1000 kg · bolsas 25/50 kg'],['Aplicación','Directa al suelo'],
+    ...(p.cult?[['Cultivos',p.cult]]:[])
+  ].map(([a,b])=>`<tr><td>${a}</td><td>${b}</td></tr>`).join('');
+  pmodal.querySelector('.mquote').href=`https://wa.me/59175375488?text=${encodeURIComponent('Hola Boltana, quiero cotizar '+p.n)}`;
+  const src=grid.children[i].querySelector('canvas');
+  const mc=document.getElementById('mcanvas');mc.getContext('2d').clearRect(0,0,620,540);
+  try{mc.getContext('2d').drawImage(src,0,0,620,540)}catch(e){}
+  pmodal.hidden=false;document.body.style.overflow='hidden';pmodal.querySelector('.mx').focus()}
+function closeProduct(){pmodal.hidden=true;document.body.style.overflow=''}
+pmodal.querySelector('.mbg').addEventListener('click',closeProduct);
+pmodal.querySelector('.mx').addEventListener('click',closeProduct);
+addEventListener('keydown',e=>{if(e.key==='Escape')closeProduct()});
+
+/* ---------- presets del armador ---------- */
+const presetsEl=document.getElementById('presets');
+function setPreset(name){[...presetsEl.children].forEach(b=>b.classList.toggle('on',b.textContent===name))}
+PRODUCTS.forEach(p=>{const b=document.createElement('button');b.type='button';b.textContent=p.n;
+  b.addEventListener('click',()=>{Object.keys(NUT).forEach(k=>{const v=Math.min(p.comp[k]||0,+nutInputs[k].inp.max);
+    state.comp[k]=v;nutInputs[k].inp.value=v;nutInputs[k].out.textContent=String(v).replace('.',',')+'%'});
+    setPreset(p.n);update()});
+  presetsEl.appendChild(b)});
+
+/* ---------- filtro: elemento → fórmulas ---------- */
+const pill=document.getElementById('filterPill');
+function clearFilter(){pill.hidden=true;[...grid.children].forEach(c=>c.classList.remove('dim','match'))}
+pill.querySelector('button').addEventListener('click',clearFilter);
+document.querySelectorAll('.el[data-k]').forEach(el=>{
+  const n=PRODUCTS.filter(p=>(p.comp[el.dataset.k]||0)>0).length;
+  const b=document.createElement('span');b.className='eln';b.textContent=n+(n===1?' fórmula':' fórmulas');el.appendChild(b)});
+document.querySelectorAll('.el[data-k]').forEach(el=>{el.tabIndex=0;el.setAttribute('role','button')});
+document.querySelectorAll('.el[data-k]').forEach(el=>el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();el.click()}}));
+document.querySelectorAll('.el[data-k]').forEach(el=>el.addEventListener('click',()=>{
+  const k=el.dataset.k;const name=NUT[k][0];let n=0;
+  [...grid.children].forEach((c,i)=>{const has=(PRODUCTS[i].comp[k]||0)>0;c.classList.toggle('match',has);c.classList.toggle('dim',!has);if(has)n++});
+  pill.querySelector('span').textContent=`${n} fórmula${n!==1?'s':''} con ${name}`;pill.hidden=false;
+  document.getElementById('productos').scrollIntoView({behavior:'smooth'})}));
+
+/* ---------- recomendador por cultivo ---------- */
+const CROPS={
+ 'Soya 🌱':[["Base","Base Forte","Corrige acidez y aporta Ca+Mg para nodulación y raíz fuerte."],["Nutrición","Fosbor","Fósforo de toda la campaña + boro para cuaje de vainas."],["Refuerzo","Boltmix","Azufre y micronutrientes para llenado de grano."]],
+ 'Maíz 🌽':[["Base","Yeso Agrícola","Descompacta y mejora entrada de agua para raíces profundas."],["Nutrición","Fosbor","Arranque vigoroso: fósforo disponible desde la siembra."],["Refuerzo","Boltmix","Zinc y azufre — el maíz castiga su deficiencia."]],
+ 'Caña de azúcar 🎋':[["Base","Oro-Negro","Materia orgánica y biología para soca tras soca."],["Nutrición","Sul-Ca-Bor","Calcio, azufre y boro para brotación y crecimiento."],["Refuerzo","Azufre mineral","Sulfatos constantes en ciclos largos."]],
+ 'Arroz 🍚':[["Base","Yeso Agrícola","Estructura y calcio en suelos inundados."],["Nutrición","Boltmix","Zinc — la deficiencia clásica del arroz — más S y Mg."],["Refuerzo","Azufre mineral","Corrige pH alcalino y libera fósforo retenido."]],
+ 'Girasol 🌻':[["Base","Base Forte","Ca+Mg para tallo firme y suelo equilibrado."],["Nutrición","Ulexita Boro 10","El girasol es EL cultivo del boro: capítulo y llenado."],["Refuerzo","Boltmix","Micronutrientes de liberación gradual."]],
+ 'Frutales 🍊':[["Base","Oro-Negro","Materia orgánica: retención de humedad y vida en el suelo."],["Nutrición","Ulexita Boro 10","Floración, cuajado y calidad de fruta."],["Refuerzo","Sul-Ca-Bor","Calcio para firmeza y menos desórdenes de fruta."]],
+ 'Hortalizas 🥬':[["Base","Oro-Negro","Suelo vivo y esponjoso para ciclos cortos e intensivos."],["Nutrición","Sul-Ca-Bor","Ca+B contra podredumbre apical y para calidad."],["Refuerzo","Boltmix","Micros completos en cada gránulo."]],
+ 'Pasturas 🐄':[["Base","Base Forte","Corrige acidez y levanta la capacidad del suelo."],["Nutrición","Yeso Agrícola","Azufre y calcio para proteína en el forraje."],["Refuerzo","Azufre mineral","Mantenimiento económico del S."]]};
+const cropsEl=document.getElementById('crops'),progEl=document.getElementById('program');
+Object.keys(CROPS).forEach(name=>{const b=document.createElement('button');b.type='button';b.textContent=name;
+  b.addEventListener('click',()=>{[...cropsEl.children].forEach(x=>x.classList.toggle('on',x===b));
+    document.getElementById('progCrop').textContent=name.replace(/ \S+$/,'');
+    document.getElementById('progGrid').innerHTML=CROPS[name].map(([fase,prod,txt])=>{
+      const i=PRODUCTS.findIndex(p=>p.n===prod);
+      return `<div class="prog-card" data-i="${i}" role="button" tabindex="0"><div class="fase">${fase}</div><h4>${prod}</h4><p>${txt}</p></div>`}).join('');
+    progEl.hidden=false;
+    [...document.querySelectorAll('.prog-card')].forEach(c=>{const open=()=>openProduct(+c.dataset.i);
+      c.addEventListener('click',open);c.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open()}})})});
+  cropsEl.appendChild(b)});
+
+/* ---------- nav activa ---------- */
+{const links=[...document.querySelectorAll('nav a[href^="#"]')];
+ const secs=links.map(a=>document.querySelector(a.getAttribute('href'))).filter(Boolean);
+ const nio=new IntersectionObserver(es=>{es.forEach(e=>{if(!e.isIntersecting)return;
+   links.forEach(a=>a.classList.toggle('act',a.getAttribute('href')==='#'+e.target.id))})},{rootMargin:'-40% 0px -50% 0px'});
+ secs.forEach(sec=>nio.observe(sec))}
+
+/* ---------- contadores ---------- */
+const cio=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;cio.unobserve(e.target);
+  const el=e.target,n=+el.dataset.count,t0=performance.now();
+  (function tick(now){const k=Math.min(1,(now-t0)/1400);const ease=1-Math.pow(1-k,3);
+    el.textContent=Math.round(n*ease);if(k<1)requestAnimationFrame(tick)})(t0)}),{threshold:.6});
+document.querySelectorAll('[data-count]').forEach(el=>cio.observe(el));
+
+/* ---------- reveal on scroll ---------- */
+const io=new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting&&e.target.classList.add('in')),{threshold:.15});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+/* ---------- granule painter (shared) ---------- */
+function paintGranule(c,{col,comp,size=3.5,powder=false,t=0,spin=true}){
+  const g=c.getContext('2d');const D=Math.min(devicePixelRatio,2);const w=c.clientWidth,h=c.clientHeight;
+  if(c.width!==w*D){c.width=w*D;c.height=h*D}g.setTransform(D,0,0,D,0,0);g.clearRect(0,0,w,h);
+  const cxp=w/2,cyp=h/2;const total=Object.values(comp).reduce((a,b)=>a+b,0);
+  if(powder){ // cloud of dust
+    const sr=seeded(11);for(let i=0;i<900;i++){const a=sr()*6.28,d=Math.pow(sr(),.6)*Math.min(w,h)*.42,k=pickKey(comp,sr()*total);g.globalAlpha=.55+sr()*.4;g.fillStyle=(k&&NUT[k])?NUT[k][1]:col;g.beginPath();g.arc(cxp+Math.cos(a+t*.05)*d,cyp+Math.sin(a+t*.05)*d*.8,.8+sr()*1.8,0,6.28);g.fill()}g.globalAlpha=1;return}
+  const R=Math.min(w,h)*(.22+(size-2)/3*.2);
+  // shadow
+  g.fillStyle='rgba(0,0,0,.25)';g.beginPath();g.ellipse(cxp,cyp+R*1.15,R*.9,R*.22,0,0,6.28);g.fill();
+  const rg=g.createRadialGradient(cxp-R*.4,cyp-R*.45,R*.05,cxp,cyp,R);rg.addColorStop(0,lighten(col,.35));rg.addColorStop(.55,col);rg.addColorStop(1,lighten(col,-.45));
+  g.fillStyle=rg;g.beginPath();g.arc(cxp,cyp,R,0,6.28);g.fill();
+  // nutrient inclusions on the sphere surface (rotating)
+  const sr=seeded(5);const n=140;g.save();g.beginPath();g.arc(cxp,cyp,R,0,6.28);g.clip();
+  for(let i=0;i<n;i++){const u=sr()*6.28+(spin?t*.35:0),v=Math.acos(2*sr()-1),k=pickKey(comp,sr()*total);if(!k||!NUT[k])continue;
+    const x=Math.sin(v)*Math.cos(u),y=Math.cos(v),z=Math.sin(v)*Math.sin(u);if(z<0)continue;
+    g.globalAlpha=.35+z*.6;g.fillStyle=NUT[k][1];g.beginPath();g.arc(cxp+x*R*.97,cyp+y*R*.97,R*(.035+sr()*.05)*(.5+z*.5),0,6.28);g.fill()}
+  g.restore();g.globalAlpha=1;
+  // rim light
+  g.strokeStyle='rgba(255,255,255,.18)';g.lineWidth=1.5;g.beginPath();g.arc(cxp,cyp,R-1,Math.PI*1.1,Math.PI*1.8);g.stroke();
+}
+function pickKey(comp,x){for(const k in comp){if(x<comp[k])return k;x-=comp[k]}return null}
+function lighten(hex,a){const n=parseInt(hex.slice(1),16);let r=n>>16,g=n>>8&255,b=n&255;const f=v=>clamp(Math.round(a>0?v+(255-v)*a:v*(1+a)),0,255);return`rgb(${f(r)},${f(g)},${f(b)})`}
+
+/* ---------- ACT 3: product cards ---------- */
+const grid=document.getElementById('grid');const cardCanvases=[];
+PRODUCTS.forEach((p,i)=>{const el=document.createElement('article');el.className='card reveal';el.style.transitionDelay=(i*60)+'ms';
+  el.innerHTML=`<canvas></canvas><div class="cod">${p.cod}</div><h3>${p.n}</h3><p>${p.d}</p><div class="chips">${Object.entries(p.comp).map(([k,v])=>`<span class="chip ${CHIP[k]}">${k} ${v}%</span>`).join('')}</div><div class="more">Ver ficha técnica →</div>`;
+  grid.appendChild(el);io.observe(el);cardCanvases.push([el.querySelector('canvas'),p]);
+  el.addEventListener('pointermove',e=>{const r=el.getBoundingClientRect();el.style.transform=`perspective(800px) rotateY(${(e.clientX-r.left-r.width/2)/r.width*10}deg) rotateX(${-(e.clientY-r.top-r.height/2)/r.height*10}deg) translateY(-6px)`});
+  el.addEventListener('pointerleave',()=>el.style.transform='');el.style.cursor='pointer';el.tabIndex=0;el.setAttribute('role','button');el.setAttribute('aria-label','Ver ficha técnica de '+p.n);el.addEventListener('click',()=>openProduct(i));el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openProduct(i)}})});
+window.__CARDS=cardCanvases.map(([c,p])=>({canvas:c,col:p.col,comp:p.comp}));
+
+/* ---------- ACT 4: builder ---------- */
+const nutri=document.getElementById('nutri');const nutInputs={};const state={fmt:'gran',size:3.5,comp:{S:20,Ca:10,P:5,B:2,Mg:2,Zn:0,Mn:0,MO:0}};
+Object.keys(NUT).forEach(k=>{const f=document.createElement('div');f.className='field';
+  f.innerHTML=`<label><span style="display:flex;align-items:center;gap:8px"><i style="width:10px;height:10px;border-radius:50%;background:${NUT[k][1]};display:inline-block"></i>${NUT[k][0]} (${k})</span><output>${state.comp[k]}%</output></label><input type="range" min="0" max="${k==='S'||k==='MO'?90:40}" step="0.5" value="${state.comp[k]}">`;
+  const inp=f.querySelector('input'),out=f.querySelector('output');nutInputs[k]={inp,out};inp.addEventListener('input',()=>{state.comp[k]=+inp.value;out.textContent=inp.value.replace('.',',')+'%';setPreset(null);update()});nutri.appendChild(f)});
+const sizeInp=document.getElementById('size'),sizeLbl=document.getElementById('sizeLbl'),sizeOut=document.getElementById('sizeOut');
+sizeInp.addEventListener('input',()=>{state.size=+sizeInp.value;sizeLbl.textContent=sizeOut.textContent=sizeInp.value.replace('.',',')+' mm';});
+document.getElementById('fmt').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;state.fmt=b.dataset.f;[...e.currentTarget.children].forEach(x=>x.classList.toggle('on',x===b));document.getElementById('sizeField').style.display=state.fmt==='gran'?'':'none';sizeOut.textContent=state.fmt==='gran'?sizeInp.value.replace('.',',')+' mm':'polvo';update()});
+function update(){window.__granDirty=true;
+  {const keysT=Object.keys(NUT);const sumT=keysT.reduce((a,k)=>a+state.comp[k],0);
+   document.getElementById('tbTrack').innerHTML=keysT.filter(k=>state.comp[k]>0).map(k=>`<i style="width:${Math.min(state.comp[k],100)}%;background:${NUT[k][1]}" title="${NUT[k][0]}"></i>`).join('');
+   document.getElementById('tbLine').innerHTML=sumT>100?`<b>⚠ ${String(sumT.toFixed(1)).replace('.',',')}% — excede el 100%</b>`:`Nutrientes: <b>${String(+sumT.toFixed(1)).replace('.',',')}%</b> · soporte mineral: ${String(+(100-sumT).toFixed(1)).replace('.',',')}%`}
+  // nearest product by cosine-ish similarity on nutrient vectors
+  const keys=Object.keys(NUT);const v=keys.map(k=>state.comp[k]);const sum=v.reduce((a,b)=>a+b,0);
+  let best=null,bs=-1;PRODUCTS.forEach(p=>{const u=keys.map(k=>p.comp[k]||0);const dot=v.reduce((a,x,i)=>a+x*u[i],0);const nv=Math.hypot(...v)||1,nu=Math.hypot(...u)||1;const s=dot/(nv*nu);if(s>bs){bs=s;best=p}});
+  document.getElementById('matchName').textContent=sum>100?'Excede el 100%':best.n;
+  document.getElementById('matchDesc').textContent=sum>100?`Tu mezcla suma ${sum.toFixed(1)}%. Bajá algún nutriente.`:`${Math.round(bs*100)}% de afinidad · ${best.d}${bs<.8?' — o la formulamos a tu medida.':''}`;
+  document.getElementById('matchBar').style.width=(sum>100?0:bs*100)+'%';
+  document.getElementById('quote').href=`https://wa.me/59175375488?text=${encodeURIComponent(`Hola Boltana, quiero cotizar un ${state.fmt==='gran'?'granulado de '+state.size+' mm':'polvo'} con: `+keys.filter(k=>state.comp[k]).map(k=>`${k} ${state.comp[k]}%`).join(', '))}`;
+}
+update();
+window.__granState=state;window.__granNut=NUT;window.__granDirty=true;
+/* fórmula en el hash: #f=S:20,Ca:10|3.5|gran */
+(function(){const m=location.hash.match(/#f=([^|]*)\|([\d.]+)\|(\w+)/);if(!m)return;
+  m[1].split(',').forEach(kv=>{const[k,v]=kv.split(':');if(NUT[k]&&nutInputs[k]){const val=Math.min(+v||0,+nutInputs[k].inp.max);state.comp[k]=val;nutInputs[k].inp.value=val;nutInputs[k].out.textContent=String(val).replace('.',',')+'%'}});
+  state.size=Math.max(2,Math.min(5,+m[2]||3.5));sizeInp.value=state.size;sizeLbl.textContent=sizeOut.textContent=String(state.size).replace('.',',')+' mm';
+  if(m[3]==='polvo')document.querySelector('#fmt button[data-f="polvo"]').click();
+  update();document.getElementById('builder').scrollIntoView()})();
+const shareBtn=document.getElementById('shareF');
+shareBtn.addEventListener('click',async()=>{
+  const f=Object.keys(NUT).filter(k=>state.comp[k]>0).map(k=>`${k}:${state.comp[k]}`).join(',');
+  const url=location.origin+location.pathname+`#f=${f}|${state.size}|${state.fmt}`;
+  let ok=false;try{await navigator.clipboard.writeText(url);ok=true}catch(e){
+    const i=document.createElement('input');i.value=url;document.body.appendChild(i);i.select();try{ok=document.execCommand('copy')}catch(_){}i.remove()}
+  shareBtn.textContent=ok?'¡Link copiado!':'No pude copiar :(';
+  setTimeout(()=>shareBtn.textContent='Copiar link de mi fórmula',2200)});
+</script>
+<script type="module" src="scene.js?v=18"></script>
+<script type="module" src="builder3d.js?v=4"></script>
+</body>
+</html>
