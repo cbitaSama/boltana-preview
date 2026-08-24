@@ -90,9 +90,9 @@ const puffs=[];for(let i=0;i<6;i++){const sp=new T.Sprite(new T.SpriteMaterial({
   powderG.add(sp);puffs.push(sp)}
 // tolva de donde cae el chorro
 {const fmat=new T.MeshStandardMaterial({color:0x2e241a,roughness:.55,side:T.DoubleSide});
- const cone=new T.Mesh(new T.CylinderGeometry(.46,.085,.52,24,1,true),fmat);cone.position.y=2.0;powderG.add(cone);
- const lip=new T.Mesh(new T.TorusGeometry(.46,.028,8,28),new T.MeshStandardMaterial({color:0x453728,roughness:.5}));
- lip.rotation.x=Math.PI/2;lip.position.y=2.26;powderG.add(lip)}
+ const cone=new T.Mesh(new T.CylinderGeometry(.4,.075,.44,24,1,true),fmat);cone.position.y=1.42;powderG.add(cone);
+ const lip=new T.Mesh(new T.TorusGeometry(.4,.026,8,28),new T.MeshStandardMaterial({color:0x453728,roughness:.5}));
+ lip.rotation.x=Math.PI/2;lip.position.y=1.64;powderG.add(lip)}
 // finos flotando
 const NFN=LOW?140:280;const fnP=new Float32Array(NFN*3),fnD=[];const fnSeed=seeded(13);
 for(let i=0;i<NFN;i++){fnP.set([(fnSeed()-.5)*3,BASE+.1+fnSeed()*2.4,(fnSeed()-.5)*2.4],i*3);fnD.push(fnSeed()*6.283)}
@@ -163,7 +163,7 @@ function frame(ts){const t=ts/1000;
       const p=stG.attributes.position.array;
       for(let i=0;i<NST;i++){const d=stD[i];
         let e=((t*d.spd*.35+d.off)%1);
-        const y=lerp(1.75,heapH(0,0)-.02,e);
+        const y=lerp(1.18,heapH(0,0)-.02,e);
         const spread=d.r0+Math.pow(e,2.2)*.5;
         const wob=Math.sin(t*3+d.wob)*.03*e;
         p[i*3]=Math.cos(d.a)*spread+wob;p[i*3+1]=y;p[i*3+2]=Math.sin(d.a)*spread+wob}
