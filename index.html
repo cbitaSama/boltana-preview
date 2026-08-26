@@ -7,6 +7,11 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"Organization","name":"Boltana Group S.R.L.","email":"boltanagroupsrl@gmail.com","telephone":"+59175375488","address":{"@type":"PostalAddress","addressLocality":"Santa Cruz de la Sierra","addressCountry":"BO"},"description":"Fabricante boliviano de fertilizantes y enmiendas granuladas (2–5 mm) y en polvo: azufre, calcio, boro, fósforo, magnesio y micronutrientes."}
 </script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"¿Boltana Group puede producir grandes volúmenes de fertilizante granulado?","acceptedAnswer":{"@type":"Answer","text":"Sí. Planta de granulación propia en Santa Cruz con tambor rotatorio y línea continua; despacho en big bags de 1000 kg y bolsas de 25/50 kg."}},
+{"@type":"Question","name":"¿Hacen fórmulas de fertilizante a medida?","acceptedAnswer":{"@type":"Answer","text":"Sí, el cliente define los nutrientes y porcentajes, se valida en laboratorio y se granula a medida."}}]}
+</script>
 <meta name="description" content="Fertilizantes y enmiendas granuladas fabricadas en Bolivia. Azufre, calcio, boro, fósforo y más — cada gránulo lleva el nutriente exacto. Armá tu propia fórmula.">
 <meta name="theme-color" content="#1a120b">
 <meta property="og:title" content="Boltana Group — La tierra se alimenta de a gránulo">
@@ -105,7 +110,11 @@ section.block{padding:clamp(80px,12vw,160px) clamp(24px,7vw,110px)}
 .block h2{font-size:clamp(36px,5vw,72px);line-height:1;max-width:14ch}
 .block .lede{margin-top:20px;max-width:56ch;font-size:17px;line-height:1.6;opacity:.75}
 
-.periodic{margin-top:64px;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.egroup{margin-top:40px}
+.egroup:first-of-type{margin-top:56px}
+.glabel{font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--ochre);margin-bottom:12px}
+.el.off{opacity:.42;cursor:default;pointer-events:none}
+.periodic{margin-top:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
 .el{aspect-ratio:1;border:1px solid rgba(243,234,216,.14);padding:14px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;cursor:default;transition:transform .35s cubic-bezier(.2,.8,.2,1),border-color .3s;background:linear-gradient(160deg,rgba(255,255,255,.03),transparent)}
 .el::after{content:"";position:absolute;inset:auto -40% -40% auto;width:120%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,var(--c) 0%,transparent 60%);opacity:0;transition:opacity .5s}
 .el:hover{transform:translateY(-6px);border-color:var(--c)}
@@ -258,6 +267,23 @@ input[type=range]::-webkit-slider-thumb{appearance:none;width:22px;height:22px;b
 .tb-line{margin-top:8px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.65}
 .tb-line b{color:var(--sulfur)}
 
+/* planta + faq */
+#planta{background:var(--soil2)}
+.fotos{margin-top:48px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:820px){.fotos{grid-template-columns:repeat(2,1fr)}}
+.fotos figure{margin:0;border-radius:14px;overflow:hidden;background:#000}
+.fotos img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;filter:saturate(.94) contrast(1.03) sepia(.1);transition:transform .5s}
+@media(hover:hover){.fotos figure:hover img{transform:scale(1.04)}}
+.fotos figcaption{font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.6;padding:8px 4px 10px}
+.faq{margin-top:56px;max-width:760px}
+.faq details{border-bottom:1px solid rgba(243,234,216,.14)}
+.faq summary{font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:18px;font-weight:600;padding:18px 34px 18px 0;cursor:pointer;list-style:none;position:relative}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:'+';position:absolute;right:4px;top:50%;transform:translateY(-50%);color:var(--sulfur);font-size:24px;font-weight:400;transition:transform .3s}
+.faq details[open] summary::after{transform:translateY(-50%) rotate(45deg)}
+.faq p{padding:0 0 20px;font-size:15px;line-height:1.6;opacity:.78;max-width:62ch}
+.faq a{color:var(--sulfur)}
+
 /* modal ficha */
 .modal{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:20px}
 .modal[hidden]{display:none}
@@ -315,16 +341,16 @@ var d=document.getElementById('errbadge');if(!d){d=document.createElement('div')
     <div class="depth" id="depth"><i></i><div><b id="depthM">0,0 m</b><span id="depthZone">Superficie</span></div></div>
     <div class="hero-copy" id="heroCopy">
       <div>
-        <h1>La tierra<br>se alimenta <em>de a gránulo</em></h1>
-        <p>Fertilizantes y enmiendas granuladas fabricadas en Bolivia. Cada gránulo lleva el nutriente exacto, a la profundidad exacta.</p>
+        <h1>La tierra<br>se alimenta <em>de nutrientes</em></h1>
+        <p>Fertilizantes y enmiendas granuladas fabricadas en Bolivia. Cada gránulo lleva el nutriente que tu suelo necesita, a la profundidad exacta.</p>
         <div class="cta">Bajá a la tierra <i></i></div>
       </div>
     </div>
 
     <div class="caption" data-at="0.22,0.40">
       <div class="k">01 · Raíces</div>
-      <h2>Lo que la planta muestra arriba, lo decide abajo.</h2>
-      <p>Debajo del cultivo hay un sistema que busca calcio, azufre, boro, fósforo. Si no los encuentra, se nota en la cosecha.</p>
+      <h2>Lo que tu cultivo muestra arriba, se decide abajo.</h2>
+      <p>Debajo de tu cultivo hay un sistema que busca calcio, azufre, boro, fósforo. Si no los encuentra, se nota en tu cosecha.</p>
     </div>
     <div class="caption right" data-at="0.45,0.66">
       <div class="k">02 · Gránulos</div>
@@ -333,7 +359,7 @@ var d=document.getElementById('errbadge');if(!d){d=document.createElement('div')
     </div>
     <div class="caption" data-at="0.70,0.92">
       <div class="k">03 · Liberación gradual</div>
-      <h2>Se disuelve al ritmo del cultivo.</h2>
+      <h2>Se disuelve al ritmo de tu cultivo.</h2>
       <p>Solubilidad equilibrada: disponibilidad continua desde la siembra hasta la cosecha, sin riesgo de toxicidad.</p>
     </div>
 
@@ -349,19 +375,33 @@ var d=document.getElementById('errbadge');if(!d){d=document.createElement('div')
 <!-- ACT 2 -->
 <section class="block" id="elementos">
   <div class="eyebrow reveal">Lo que llevamos al suelo</div>
-  <h2 class="reveal">Siete elementos. Un solo gránulo.</h2>
-  <p class="lede reveal">Todo lo que formulamos sale de estos elementos. Pasá el cursor para ver qué hace cada uno — y <b>tocá uno</b> para ver qué fórmulas lo llevan.</p>
-  <div class="periodic reveal">
-    <div class="el" data-k="S" style="--c:#e8c547"><span class="num">16</span><span class="sym">S</span><div><span class="name">Azufre</span><p class="role">Síntesis de proteínas · corrige suelos alcalinos · potencia el nitrógeno</p></div></div>
-    <div class="el" data-k="Ca" style="--c:#e0d6c3"><span class="num">20</span><span class="sym">Ca</span><div><span class="name">Calcio</span><p class="role">Estructura del suelo · paredes celulares · raíces profundas</p></div></div>
-    <div class="el" data-k="B" style="--c:#7d8fb6"><span class="num">5</span><span class="sym">B</span><div><span class="name">Boro</span><p class="role">Floración, cuajado y polinización · transporte de azúcares</p></div></div>
-    <div class="el" data-k="P" style="--c:#d98b5b"><span class="num">15</span><span class="sym">P</span><div><span class="name">Fósforo</span><p class="role">Arranque radicular · energía · disponible toda la campaña</p></div></div>
-    <div class="el" data-k="Mg" style="--c:#9bc39e"><span class="num">12</span><span class="sym">Mg</span><div><span class="name">Magnesio</span><p class="role">Centro de la clorofila · reduce acidez · intercambio catiónico</p></div></div>
-    <div class="el" data-k="Zn" style="--c:#9aa5ab"><span class="num">30</span><span class="sym">Zn</span><div><span class="name">Zinc</span><p class="role">Corrige deficiencias que frenan el crecimiento</p></div></div>
-    <div class="el" data-k="Mn" style="--c:#b26a8a"><span class="num">25</span><span class="sym">Mn</span><div><span class="name">Manganeso</span><p class="role">Fotosíntesis · activación enzimática</p></div></div>
+  <h2 class="reveal">Macros y micronutrientes. Un solo gránulo.</h2>
+  <p class="lede reveal">La materia orgánica es el componente esencial; los macros son el plato fuerte y los micros, la precisión. <b>Tocá los encendidos</b> para ver qué fórmulas los llevan a tu suelo.</p>
+  <div class="egroup reveal"><div class="glabel">Componente esencial</div>
+  <div class="periodic">
     <div class="el" data-k="MO" style="--c:#6b4a2e"><span class="num">—</span><span class="sym">MO</span><div><span class="name">Materia orgánica</span><p class="role">Leonardita + biochar · retiene humedad · vida microbiana</p></div></div>
-  </div>
-</section>
+  </div></div>
+  <div class="egroup reveal"><div class="glabel">Macronutrientes</div>
+  <div class="periodic">
+    <div class="el off" style="--c:#8aa0b8"><span class="num">7</span><span class="sym">N</span><div><span class="name">Nitrógeno</span><p class="role">El motor del crecimiento — se complementa en tu plan NPK</p></div></div>
+    <div class="el" data-k="P" style="--c:#d98b5b"><span class="num">15</span><span class="sym">P</span><div><span class="name">Fósforo</span><p class="role">Arranque radicular · energía · disponible toda la campaña</p></div></div>
+    <div class="el off" style="--c:#b8a888"><span class="num">19</span><span class="sym">K</span><div><span class="name">Potasio</span><p class="role">Llenado y calidad — se complementa en tu plan NPK</p></div></div>
+    <div class="el" data-k="Ca" style="--c:#e0d6c3"><span class="num">20</span><span class="sym">Ca</span><div><span class="name">Calcio</span><p class="role">Estructura del suelo · paredes celulares · raíces profundas</p></div></div>
+    <div class="el" data-k="Mg" style="--c:#9bc39e"><span class="num">12</span><span class="sym">Mg</span><div><span class="name">Magnesio</span><p class="role">Centro de la clorofila · reduce acidez · intercambio catiónico</p></div></div>
+    <div class="el" data-k="S" style="--c:#e8c547"><span class="num">16</span><span class="sym">S</span><div><span class="name">Azufre</span><p class="role">Síntesis de proteínas · corrige suelos alcalinos · potencia el N</p></div></div>
+  </div></div>
+  <div class="egroup reveal"><div class="glabel">Micronutrientes</div>
+  <div class="periodic">
+    <div class="el" data-k="B" style="--c:#7d8fb6"><span class="num">5</span><span class="sym">B</span><div><span class="name">Boro</span><p class="role">Floración, cuajado y polinización · transporte de azúcares</p></div></div>
+    <div class="el" data-k="Zn" style="--c:#9aa5ab"><span class="num">30</span><span class="sym">Zn</span><div><span class="name">Zinc</span><p class="role">Corrige deficiencias que frenan tu crecimiento</p></div></div>
+    <div class="el off" style="--c:#b07f5e"><span class="num">26</span><span class="sym">Fe</span><div><span class="name">Hierro</span><p class="role">Clorofila y enzimas — liberado por nuestro azufre</p></div></div>
+    <div class="el" data-k="Mn" style="--c:#b26a8a"><span class="num">25</span><span class="sym">Mn</span><div><span class="name">Manganeso</span><p class="role">Fotosíntesis · activación enzimática</p></div></div>
+    <div class="el off" style="--c:#c78f5a"><span class="num">29</span><span class="sym">Cu</span><div><span class="name">Cobre</span><p class="role">Lignificación — te asesoramos en su manejo</p></div></div>
+    <div class="el off" style="--c:#9b8fb0"><span class="num">42</span><span class="sym">Mo</span><div><span class="name">Molibdeno</span><p class="role">Fijación de N en soya — te asesoramos</p></div></div>
+    <div class="el off" style="--c:#8fb0a0"><span class="num">17</span><span class="sym">Cl</span><div><span class="name">Cloro</span><p class="role">Balance hídrico — raro que falte</p></div></div>
+    <div class="el off" style="--c:#a0a8a0"><span class="num">28</span><span class="sym">Ni</span><div><span class="name">Níquel</span><p class="role">Ureasa — traza esencial</p></div></div>
+  </div></div>
+  </section>
 
 <!-- PROCESO -->
 <section class="block" id="proceso">
@@ -438,6 +478,28 @@ var d=document.getElementById('errbadge');if(!d){d=document.createElement('div')
   </div>
 </section>
 
+<!-- PLANTA REAL + FAQ -->
+<section class="block" id="planta">
+  <div class="eyebrow reveal">La prueba, no la promesa</div>
+  <h2 class="reveal">¿Que si tenemos la producción? Vení a verla.</h2>
+  <p class="lede reveal">Es la pregunta que más nos hacen. La respuesta está en Santa Cruz: planta de granulación propia, laboratorio de control y despacho en big bags de 1000 kg. <b>Fotos reales de nuestra planta</b> — sin retoques.</p>
+  <div class="fotos reveal">
+    <figure><img loading="lazy" src="assets/planta/nave.jpg" alt="Nave industrial de Boltana con torres de granulación y big bags"><figcaption>La nave de granulación</figcaption></figure>
+    <figure><img loading="lazy" src="assets/planta/planta.jpg" alt="Torres, cintas y tolvas de la planta de Boltana"><figcaption>Torres y cintas de proceso</figcaption></figure>
+    <figure><img loading="lazy" src="assets/planta/tambor.jpg" alt="Tambor rotatorio de secado y granulación"><figcaption>El tambor de granulación</figcaption></figure>
+    <figure><img loading="lazy" src="assets/planta/granulos-mano.jpg" alt="Gránulos de 2 a 5 mm en la mano"><figcaption>Gránulos 2–5 mm, recién salidos</figcaption></figure>
+    <figure><img loading="lazy" src="assets/planta/granulos.jpg" alt="Plato con gránulos terminados"><figcaption>Producto terminado</figcaption></figure>
+    <figure><img loading="lazy" src="assets/planta/laboratorio.jpg" alt="Muestras de minerales molidos en el laboratorio"><figcaption>Control de calidad en laboratorio</figcaption></figure>
+  </div>
+  <div class="faq reveal">
+    <details open><summary>¿De verdad pueden producir el volumen que necesito?</summary><p>Sí. Tenemos planta de granulación propia en Santa Cruz —la de las fotos— con tambor rotatorio, línea continua y despacho en big bags de 1000 kg o bolsas de 25/50 kg. Y si querés verla con tus ojos, <a href="https://wa.me/59175375488?text=Hola%20Boltana%2C%20quiero%20coordinar%20una%20visita%20a%20la%20planta">coordinamos una visita</a>.</p></details>
+    <details><summary>¿Hacen fórmulas a medida?</summary><p>Es nuestra especialidad: armás tu mezcla en el <a href="#builder">configurador</a>, la revisamos en laboratorio y la granulamos con tus porcentajes. Cada lote se controla antes de salir.</p></details>
+    <details><summary>¿En qué presentaciones entregan?</summary><p>Big bags de 1000 kg y bolsas de 25 y 50 kg, en granulado 2–5 mm (95% de uniformidad) o en polvo, según tu forma de aplicación.</p></details>
+    <details><summary>¿Atienden fuera de Santa Cruz?</summary><p>Sí, coordinamos logística a todo Bolivia. Y exportamos ulexita (boro) a la región.</p></details>
+    <details><summary>No sé qué necesita mi suelo, ¿me ayudan?</summary><p>Sí: con tu análisis de suelo (o ayudándote a hacerlo) te recomendamos el programa por cultivo y ajustamos la fórmula sin costo.</p></details>
+  </div>
+</section>
+
 <div class="modal" id="pmodal" hidden>
   <div class="mbg"></div>
   <div class="mcard">
@@ -477,7 +539,7 @@ const PRODUCTS=[
  {n:"Oro-Negro",ben:["Sube la materia orgánica y retiene humedad", "Estimula la biología del suelo", "Menos lixiviación: tus fertilizantes rinden más"],cod:"Orgánico · Leonardita · Biochar",col:"#2b1d13",d:"40–50% materia orgánica, azufre y micronutrientes. Vida para el suelo.",comp:{MO:45,S:7,Ca:2,Zn:1.6,Mn:.8,B:.1},hum:"<10%",ph:"6,5–7,5",cult:"Soya · Maíz · Caña de azúcar"},
  {n:"Ulexita Boro 10",ben:["Boro para floración, cuajado y desarrollo de frutos", "Liberación controlada, sin riesgo de toxicidad", "Aporta silicio y magnesio adicionales"],cod:"PH-B10",col:"#e6e0d2",d:"Boro de liberación controlada para floración, cuajado y frutos.",comp:{B:10,Ca:11,Mg:2.6},hum:"<7%",ph:"9,8 a 20°C",pres:"Big bags de 1000 kg"},
  {n:"Yeso Agrícola",ben:["Reduce compactación: más aire y agua en el perfil", "Moviliza N, P, K y Zn retenidos", "Calcio de alta solubilidad para raíz profunda"],cod:"CaSO₄·2H₂O",col:"#ece7da",d:"Mejora la estructura del suelo, reduce compactación, libera N-P-K.",comp:{Ca:22,S:16,B:.7},hum:"<5%",ph:"6,5–7,5",gr:"2–5 mm (90%)",pres:"Big bags de 1000 kg"},
- {n:"Azufre mineral",ben:["86,74% de pureza mineral", "Corrige suelos alcalinos, libera fósforo y hierro", "Oxidación gradual: sulfatos todo el ciclo"],cod:"S 86,74%",col:"#e8c547",d:"Alta pureza. Oxidación microbiológica: sulfatos constantes, baja el pH.",comp:{S:86},hum:"5%",ph:"3,0–5,5",pres:"Polvo fino o granulado"},
+ {n:"Azufre mineral",ben:["86,74% de pureza mineral", "Corrige suelos alcalinos, libera fósforo y hierro", "Oxidación gradual: sulfatos todo el ciclo"],cod:"S 86,74%",col:"#e8c547",d:"Alta pureza. Oxidación microbiológica: sulfatos constantes, baja el pH.",comp:{S:86.74},hum:"5%",ph:"3,0–5,5",pres:"Polvo fino o granulado"},
 ];
 const NUT={S:["Azufre","#e8c547"],Ca:["Calcio","#e0d6c3"],P:["Fósforo","#d98b5b"],B:["Boro","#7d8fb6"],Mg:["Magnesio","#9bc39e"],Zn:["Zinc","#9aa5ab"],Mn:["Manganeso","#b26a8a"],MO:["Mat. orgánica","#6b4a2e"]};
 const CHIP={S:"s",Ca:"ca",P:"p",B:"b",Mg:"mg",Zn:"zn",Mn:"mn",MO:"mo"};
@@ -644,7 +706,7 @@ shareBtn.addEventListener('click',async()=>{
   shareBtn.textContent=ok?'¡Link copiado!':'No pude copiar :(';
   setTimeout(()=>shareBtn.textContent='Copiar link de mi fórmula',2200)});
 </script>
-<script type="module" src="scene.js?v=21"></script>
-<script type="module" src="builder3d.js?v=9"></script>
+<script type="module" src="scene.js?v=23"></script>
+<script type="module" src="builder3d.js?v=10"></script>
 </body>
 </html>

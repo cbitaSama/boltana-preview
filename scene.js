@@ -99,49 +99,57 @@ const clouds=[];const ct=cloudTex();
 for(let i=0;i<7;i++){const m=new T.Sprite(new T.SpriteMaterial({map:ct,transparent:true,opacity:.8,depthWrite:false,fog:false}));
   m.position.set((rnd()-.5)*70,7+rnd()*8,-20-rnd()*25);const s=10+rnd()*14;m.scale.set(s,s*.45,1);m.userData.v=.05+rnd()*.12;clouds.push(m);scene.add(m)}
 
-// ---------- CAMPO DE TRIGO HD (espiga de granos reales, vertex colors, viento GPU) ----------
+// ---------- CAMPO DE SOYA (pedido de Rommel: hojas redonditas trifoliadas, tallo, vainas) ----------
 function bakeColor(geo,fn){const p=geo.attributes.position;const arr=new Float32Array(p.count*3);const c=new T.Color();
   for(let i=0;i<p.count;i++){fn(c,p.getX(i),p.getY(i),p.getZ(i));arr.set([c.r,c.g,c.b],i*3)}
   geo.setAttribute('color',new T.BufferAttribute(arr,3));return geo}
 const wparts=[];
-// tallo: cilindro fino con gradiente verde
-{const g=new T.CylinderGeometry(0.009,0.017,1,6);
- bakeColor(g,(c,x,y)=>{c.setHSL(.24,.5,lerp(.16,.34,y+.5))});wparts.push({geo:g,mat:0})}
-// espiga: 11 granos alternados + corona
-{const NGR=LOW?7:11;for(let i=0;i<NGR;i++){const y=0.50+i*(LOW?0.042:0.028);const side=i%2?1:-1;
-  const g=LOW?new T.SphereGeometry(0.027,5,4):new T.SphereGeometry(0.024,6,5);g.scale(1,1.85,.82);g.rotateZ(side*0.48);
-  g.translate(side*0.026,y,(i%3-1)*0.008);
-  const tint=.86+((i*37)%10)*.012;
-  bakeColor(g,(c)=>{c.setRGB(.82*tint,.66*tint,.3*tint)});wparts.push({geo:g,mat:0})}
- const top=new T.SphereGeometry(0.022,6,5);top.scale(1,1.9,.8);top.translate(0,0.80,0);
- bakeColor(top,(c)=>{c.setRGB(.8,.64,.28)});wparts.push({geo:top,mat:0})}
-// aristas (pelitos de la espiga)
-if(!LOW){for(let i=0;i<6;i++){const g=new T.ConeGeometry(0.0035,0.34,3);const a=(i/6)*6.28;
-  g.rotateZ(Math.sin(a)*.22);g.rotateX(Math.cos(a)*.22);g.translate(Math.sin(a)*.03,0.86,Math.cos(a)*.03);
-  bakeColor(g,(c)=>{c.setRGB(.82,.7,.38)});wparts.push({geo:g,mat:0})}}
-// hojas con curva y gradiente
-function leafHD(sign){const g=new T.PlaneGeometry(0.13,0.55,1,5);const p=g.attributes.position;
-  for(let i=0;i<p.count;i++){const y=p.getY(i);
-    p.setX(i,p.getX(i)*(1-Math.abs(y+.27)*.9)+sign*Math.pow(y+0.27,2)*1.0);
-    p.setZ(i,Math.pow(y+0.27,2)*0.42)}
-  g.rotateZ(sign*-0.55);g.translate(sign*0.05,0.0,0);if(sign<0)g.rotateY(Math.PI*0.65);
-  bakeColor(g,(c,x,y)=>{c.setHSL(.25,.48,lerp(.18,.36,clamp(y+.5,0,1)))});return g}
-wparts.push({geo:leafHD(1),mat:0});if(!LOW)wparts.push({geo:leafHD(-1),mat:0});
+// tallo
+{const g=new T.CylinderGeometry(0.013,0.02,1,6);
+ bakeColor(g,(c,x,y)=>{c.setHSL(.24,.42,lerp(.16,.3,y+.5))});wparts.push({geo:g,mat:0})}
+// hoja trifoliada: peciolo + 3 folíolos redondos
+function leaflet(){const g=new T.CircleGeometry(0.085,LOW?6:8);
+  const p=g.attributes.position;for(let i=0;i<p.count;i++){const x=p.getX(i),y=p.getY(i);
+    p.setY(i,y*1.3);p.setZ(i,-(x*x+y*y)*.9)} // ovalada y con cuenco
+  return g}
+function cluster(yy,ang,scale){
+  const parts=[];
+  const pet=new T.CylinderGeometry(0.0055,0.0075,0.17,5);
+  pet.translate(0,0.085,0);pet.rotateZ(1.15);pet.rotateY(ang);pet.translate(0,yy,0);
+  bakeColor(pet,c=>c.setHSL(.25,.4,.24));parts.push(pet);
+  for(let j=-1;j<=1;j++){const lf=leaflet();
+    lf.rotateX(-Math.PI/2+.5); lf.rotateY(j*.85);
+    lf.scale(scale,scale,scale);
+    lf.translate(Math.cos(ang)*.16,yy+.075+(j===0?.012:0),-Math.sin(ang)*.16);
+    const hue=.27+rnd()*.04,li=.24+rnd()*.09;
+    bakeColor(lf,(c,x,y)=>{c.setHSL(hue,.5,li+y*.25)});parts.push(lf)}
+  return parts}
+{const NCL2=LOW?2:4;
+ for(let i=0;i<NCL2;i++){const yy=-0.28+i*(LOW?0.5:0.26);
+  cluster(yy,i*2.4,0.95+i*0.13).forEach(g=>wparts.push({geo:g,mat:0}))}}
+// vainas (solo desktop)
+if(!LOW){for(let i=0;i<3;i++){const g=new T.SphereGeometry(0.026,6,5);g.scale(1,2.6,.9);
+  g.rotateZ(.5+(i-1)*.3);g.rotateY(i*2.1);g.translate(Math.cos(i*2.1)*.05,-0.1+i*.14,Math.sin(i*2.1)*.05);
+  bakeColor(g,c=>c.setHSL(.22,.42,.34+rnd()*.06));wparts.push({geo:g,mat:0})}}
 const wheatGeo=mergeGeoms(wparts);
-const wheatMat=windify(new T.MeshStandardMaterial({vertexColors:true,roughness:.78,side:T.DoubleSide}));
-const NB=LOW?680:1800;const wheat=new T.InstancedMesh(wheatGeo,wheatMat,NB);
+const wheatMat=windify(new T.MeshStandardMaterial({vertexColors:true,roughness:.8,side:T.DoubleSide}));
+const NB=LOW?680:1750;const wheat=new T.InstancedMesh(wheatGeo,wheatMat,NB);
 {const m=new T.Matrix4(),q=new T.Quaternion(),e=new T.Euler(),ps=new T.Vector3(),sc=new T.Vector3(),col=new T.Color();
  let i=0,guard=0;
- while(i<NB&&guard++<40000){const x=(rnd()-.5)*30,z=-16+rnd()*23,h=.9+rnd()*.7;
-  if((Math.abs(x-0.35)<1.7&&z>0.6&&z<8.6)||Math.hypot(x-0.35,z-3.4)<2.4)continue; // sendero por donde baja la camara
-  e.set((rnd()-.5)*.14,rnd()*6.28,(rnd()-.5)*.14);q.setFromEuler(e);ps.set(x,h/2-.02+terrainH(x,z),z);sc.set(1,h,1);
+ // en HILERAS, como cultivo real
+ while(i<NB&&guard++<40000){
+  const row=(guard%56);const z=-26+row*.62;const x=(rnd()-.5)*31;
+  const h=.5+rnd()*.3;
+  if((Math.abs(x-0.35)<1.7&&z>0.6&&z<8.6)||Math.hypot(x-0.35,z-3.4)<2.4)continue;
+  e.set((rnd()-.5)*.16,rnd()*6.28,(rnd()-.5)*.16);q.setFromEuler(e);
+  ps.set(x,h/2-.02+terrainH(x,z),z);sc.set(1,h,1);
   m.compose(ps,q,sc);wheat.setMatrixAt(i,m);
-  const l=.78+rnd()*.32;col.setRGB(l,l*(0.96+rnd()*.08),l);wheat.setColorAt(i,col);i++}
+  const l=.8+rnd()*.35;col.setRGB(l*(0.94+rnd()*.06),l,l*(0.92+rnd()*.06));wheat.setColorAt(i,col);i++}
  wheat.instanceColor.needsUpdate=true}
 if(!LOW){wheat.castShadow=true}
 scene.add(wheat);
 
-// ---------- COLINAS lejanas + RESPLANDOR de sol ----------
+// ---------- COLINAS// ---------- COLINAS lejanas + RESPLANDOR de sol ----------
 const hills=[];
 [[-38,-58,26,0x8fa383],[6,-64,34,0x9aab8c],[42,-56,24,0x87997c]].forEach(([x,z,r,c])=>{
   const h=new T.Mesh(new T.SphereGeometry(r,24,12),new T.MeshBasicMaterial({color:c}));
@@ -294,19 +302,29 @@ scene.add(rocks);
 // ---------- RAÍCES (tubos con crecimiento por plano de recorte) ----------
 const clipPlane=new T.Plane(new T.Vector3(0,1,0),0);
 const rootMat=new T.MeshStandardMaterial({color:0xf0e6d2,roughness:.8,clippingPlanes:[clipPlane]});
-const rootGeos=[],tips=[];
+const rootGeos=[],tips=[],nodPts=[];
 function branch(p0,dir,depth){
   const pts=[p0.clone()];let p=p0.clone(),d=dir.clone();
   const len=1.7*Math.pow(.64,depth)*(0.8+rnd()*.4);
-  for(let i=0;i<4;i++){d.add(new T.Vector3((rnd()-.5)*.55,-(.12+rnd()*.22),(rnd()-.5)*.55)).normalize();
+  for(let i=0;i<4;i++){d.add(new T.Vector3((rnd()-.5)*.85,-(.1+rnd()*.2),(rnd()-.5)*.85)).normalize();
     p=p.clone().addScaledVector(d,len/4);pts.push(p.clone())}
   rootGeos.push(new T.TubeGeometry(new T.CatmullRomCurve3(pts),10,0.02+0.075*Math.pow(.6,depth),5,false));
+  if(depth>=1)pts.forEach((pt,pi)=>{if(pi>0&&rnd()<(depth>=2?.55:.25))nodPts.push({p:pt,r:.02+rnd()*.032})});
   if(depth>=4){tips.push(p.clone());return}
   const k=depth===0?3:2;
   for(let i=0;i<k;i++)branch(p,d.clone().add(new T.Vector3((rnd()-.5)*1.3,-rnd()*.35,(rnd()-.5)*1.3)).normalize(),depth+1)
 }
 [[-3.4,-2.2],[-.2,-3.4],[3,-1.8],[6.2,-4.5],[-6.6,-4.2]].forEach(([x,z])=>branch(new T.Vector3(x,.06,z),new T.Vector3(0,-1,0),0));
 const roots=new T.Mesh(mergeGeoms(rootGeos.map(g=>({geo:g,mat:0}))),rootMat);scene.add(roots);
+// nódulos de la soya (bolitas en las raíces) — crecen con el mismo plano de recorte
+const nodMat=new T.MeshStandardMaterial({color:0xd8ab84,roughness:.75,clippingPlanes:[clipPlane]});
+const NNOD=Math.min(nodPts.length,LOW?160:360);
+const nods=new T.InstancedMesh(new T.SphereGeometry(1,7,6),nodMat,NNOD);
+{const m=new T.Matrix4(),q=new T.Quaternion(),ps=new T.Vector3(),sc=new T.Vector3();
+ for(let i=0;i<NNOD;i++){const n=nodPts[(i*7)%nodPts.length];
+  ps.copy(n.p);ps.x+=(rnd()-.5)*.05;ps.z+=(rnd()-.5)*.05;
+  sc.setScalar(n.r);m.compose(ps,q,sc);nods.setMatrixAt(i,m)}}
+scene.add(nods);
 
 // ---------- textura moteada (gránulo realista) ----------
 function mottleTex(){const c=document.createElement('canvas');c.width=c.height=256;const g=c.getContext('2d');
@@ -417,7 +435,7 @@ function frame(ts){const t=ts/1000;const dt=Math.min(.05,t-lastT||.016);lastT=t;
   if(pollen.visible){const a=polG.attributes.position.array;
     for(let i=0;i<NPOL;i++){a[i*3]+=Math.sin(t*.6+polD[i])*.004+.006;a[i*3+1]+=Math.cos(t*.5+polD[i])*.003;if(a[i*3]>13)a[i*3]=-13}
     polG.attributes.position.needsUpdate=true}
-  roots.visible=p>.08&&p<.75;
+  roots.visible=p>.08&&p<.75;nods.visible=roots.visible;
   const bk=smooth(.09,.17,p)*(1-smooth(.3,.42,p));beams.forEach((b,i)=>{b.material.opacity=bk*(.16+i*.03);b.visible=bk>0;b.rotation.z+=Math.sin(t*.3+i)*.0004});
   worms.forEach(w=>w.visible=p>.13&&p<.55);if(p>.13&&p<.55)updateWorms(t,dt);
   motes.visible=p>.12;

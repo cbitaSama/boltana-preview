@@ -105,14 +105,25 @@ function colorList(comp,NUT){const entries=Object.entries(comp).filter(([k,v])=>
   const total=entries.reduce((a,[,v])=>a+v,0);const cols=[];
   entries.forEach(([k,v])=>{const n=Math.max(1,Math.round(v/Math.max(total,1)*100));for(let i=0;i<n;i++)cols.push(NUT[k][1])});
   if(!cols.length)cols.push('#8a7a5f');return cols}
+const bodyCol=new T.Color('#e9e1cd');
 function recolor(){const st=window.__granState,NUT=window.__granNut;if(!st||!NUT)return;
+  // el CUERPO del gránulo mezcla su color según la fórmula (pedido de Rommel):
+  // más yeso→blanco, más azufre→amarillo, más MO/roca→oscuro
+  {const entries=Object.entries(st.comp).filter(([k,v])=>v>0&&NUT[k]);
+   const total=entries.reduce((a,[,v])=>a+v,0);
+   const base=new T.Color('#e9e1cd');const tmp=new T.Color();
+   let wr=Math.max(0,100-total),r=base.r*wr,g=base.g*wr,b=base.b*wr,w=wr;
+   entries.forEach(([k,v])=>{tmp.set(NUT[k][1]);r+=tmp.r*v;g+=tmp.g*v;b+=tmp.b*v;w+=v});
+   if(w>0)bodyCol.setRGB(r/w,g/w,b/w).lerp(base,.28);else bodyCol.copy(base);
+   gran.material.color.copy(bodyCol);
+   heap.material.color.copy(bodyCol).lerp(base,.25)}
   const cols=colorList(st.comp,NUT);const c=new T.Color();const r5=seeded(5);
   for(let i=0;i<NSP;i++){c.set(cols[(r5()*cols.length)|0]);specks.setColorAt(i,c)}
   specks.instanceColor.needsUpdate=true;
-  for(let i=0;i<NSF;i++){if(r5()<.2)c.set(cols[(r5()*cols.length)|0]);else{const l=.75+r5()*.18;c.setRGB(l,l*.95,l*.85)}
+  for(let i=0;i<NSF;i++){if(r5()<.2)c.set(cols[(r5()*cols.length)|0]);else{const l=.9+r5()*.2;c.copy(bodyCol).multiplyScalar(l)}
     sfC.set([c.r,c.g,c.b],i*3)}
   sfG.attributes.color.needsUpdate=true;
-  for(let i=0;i<NST;i++){if(r5()<.35)c.set(cols[(r5()*cols.length)|0]);else{const l=.8+r5()*.15;c.setRGB(l,l*.94,l*.82)}
+  for(let i=0;i<NST;i++){if(r5()<.35)c.set(cols[(r5()*cols.length)|0]);else{const l=.92+r5()*.18;c.copy(bodyCol).multiplyScalar(l)}
     stC.set([c.r,c.g,c.b],i*3)}
   stG.attributes.color.needsUpdate=true}
 
