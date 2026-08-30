@@ -14,8 +14,12 @@
 </script>
 <meta name="description" content="Fertilizantes y enmiendas granuladas fabricadas en Bolivia. Azufre, calcio, boro, fósforo y más — cada gránulo lleva el nutriente exacto. Armá tu propia fórmula.">
 <meta name="theme-color" content="#1a120b">
-<meta property="og:title" content="Boltana Group — La tierra se alimenta de a gránulo">
+<meta property="og:title" content="Boltana Group — La tierra se alimenta de nutrientes">
 <meta property="og:description" content="Fertilizantes granulados 2–5 mm hechos en Santa Cruz. Armá tu propio granulado con los nutrientes que tu suelo necesita.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://cbitasama.github.io/boltana-preview/">
+<meta property="og:image" content="https://cbitasama.github.io/boltana-preview/assets/bolsa-boltana.png">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%BE%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..800&family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&display=swap" rel="stylesheet">
@@ -68,7 +72,7 @@ nav .logo small{display:block;font-size:10px;letter-spacing:.4em;opacity:.8}
 nav ul{display:flex;gap:28px;list-style:none;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
 nav a{text-decoration:none;opacity:.85;padding-bottom:3px;border-bottom:1px solid transparent}
 nav a.act{opacity:1;border-bottom-color:currentColor}
-@media(max-width:720px){nav{padding:12px 16px;align-items:flex-start}nav .logo{font-size:16px}nav .logo small{font-size:7px;letter-spacing:.28em}nav ul{gap:10px;font-size:10px;letter-spacing:.03em;white-space:nowrap;flex-wrap:nowrap}nav ul li:first-child,nav ul li:last-child{display:none}}
+@media(max-width:720px){nav{padding:12px 16px;align-items:flex-start}nav .logo{font-size:16px}nav .logo small{font-size:7px;letter-spacing:.28em}nav ul{gap:10px;font-size:10px;letter-spacing:.03em;white-space:nowrap;flex-wrap:nowrap}nav ul li:first-child,nav ul li:nth-child(3){display:none}}
 
 /* ===== ACT 1: hero + descenso (sticky canvas) ===== */
 #descent{position:relative;height:600vh}
@@ -168,6 +172,7 @@ section.block{padding:clamp(80px,12vw,160px) clamp(24px,7vw,110px)}
 .el{cursor:pointer}
 .fpill{display:inline-flex;align-items:center;gap:12px;margin-top:28px;padding:10px 16px;border-radius:999px;background:var(--ink);color:var(--cream);font-size:13px}
 .fpill button{border:0;background:transparent;color:var(--sulfur);font:inherit;cursor:pointer}
+.fpill[hidden]{display:none}
 .card{transition:transform .4s cubic-bezier(.2,.8,.2,1),opacity .4s,filter .4s}
 .card.dim{opacity:.3;filter:grayscale(.5)}
 .card.match{box-shadow:0 0 0 2px var(--field2),0 20px 40px -28px rgba(20,16,12,.5)}
@@ -323,7 +328,7 @@ footer .big{font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:cla
 <body>
 
 <div id="veil"></div>
-<script>addEventListener('error',function(e){
+<script>if(/[?&]debug=1/.test(location.search))addEventListener('error',function(e){
 var f=e.filename||'';var m=e.message||'';
 if(!f||f.indexOf(location.host)===-1)return; /* extensiones del navegador y scripts ajenos: ignorar */
 if(m==='Script error.'||/__firefox__|ethereum|solana|extension/i.test(m))return;
@@ -672,7 +677,7 @@ window.__CARDS=cardCanvases.map(([c,p])=>({canvas:c,col:p.col,comp:p.comp}));
 /* ---------- ACT 4: builder ---------- */
 const nutri=document.getElementById('nutri');const nutInputs={};const state={fmt:'gran',size:3.5,comp:{S:20,Ca:10,P:5,B:2,Mg:2,Zn:0,Mn:0,MO:0}};
 Object.keys(NUT).forEach(k=>{const f=document.createElement('div');f.className='field';
-  f.innerHTML=`<label><span style="display:flex;align-items:center;gap:8px"><i style="width:10px;height:10px;border-radius:50%;background:${NUT[k][1]};display:inline-block"></i>${NUT[k][0]} (${k})</span><output>${state.comp[k]}%</output></label><input type="range" min="0" max="${k==='S'||k==='MO'?90:40}" step="0.5" value="${state.comp[k]}">`;
+  f.innerHTML=`<label><span style="display:flex;align-items:center;gap:8px"><i style="width:10px;height:10px;border-radius:50%;background:${NUT[k][1]};display:inline-block"></i>${NUT[k][0]} (${k})</span><output>${state.comp[k]}%</output></label><input type="range" min="0" max="${k==='S'||k==='MO'?90:40}" step="0.1" value="${state.comp[k]}">`;
   const inp=f.querySelector('input'),out=f.querySelector('output');nutInputs[k]={inp,out};inp.addEventListener('input',()=>{state.comp[k]=+inp.value;out.textContent=inp.value.replace('.',',')+'%';setPreset(null);update()});nutri.appendChild(f)});
 const sizeInp=document.getElementById('size'),sizeLbl=document.getElementById('sizeLbl'),sizeOut=document.getElementById('sizeOut');
 sizeInp.addEventListener('input',()=>{state.size=+sizeInp.value;sizeLbl.textContent=sizeOut.textContent=sizeInp.value.replace('.',',')+' mm';});
